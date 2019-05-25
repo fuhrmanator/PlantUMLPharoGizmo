@@ -1,6 +1,49 @@
 Extension { #name : #String }
 
 { #category : #'*PUGizmo' }
+String >> _decode64 [
+	"Taken from PlantUML Gizmo code (in Javascript)"
+	| i c1 c2 c3 c4 ss |
+	i := 0.
+	ss := ''.
+	[ i < self size ]
+		whileTrue: [
+			c1 := (self at: i+1) _decode6bit. "var c1 = decode6bit(data.substring(i,i+1));"
+			c2 := (self at: i+2) _decode6bit. "var c2 = decode6bit(data.substring(i+1,i+2));"
+			c3 := (self at: i+3) _decode6bit. "var c3 = decode6bit(data.substring(i+2,i+3));"
+			c4 := (self at: i+4) _decode6bit. "var c4 = decode6bit(data.substring(i+3,i+4));"
+			ss := ss , (Character value: ((c1 << 2) | (c2 >> 4))) asString. "ss += String.fromCharCode((c1 << 2) | (c2 >> 4));"
+			ss := ss , (Character value: (((c2 & 16r0F) << 4) | (c3 >> 2))) asString. "ss += String.fromCharCode(((c2 & 0x0F) << 4) | (c3 >> 2));"
+			ss := ss , (Character value: (((c3 & 16r3) << 6) | c4)) asString. "ss += String.fromCharCode(((c3 & 0x3) << 6) | c4);"
+			i := i + 4 ].
+	^ ss
+"function decode64(data) {
+	 var pos = 0;
+	 var ss = "";
+	 for (var i=0; i<data.length; i+=4) {
+			var c1 = decode6bit(data.substring(i,i+1));
+			var c2 = decode6bit(data.substring(i+1,i+2));
+			var c3 = decode6bit(data.substring(i+2,i+3));
+			var c4 = decode6bit(data.substring(i+3,i+4));
+			ss += String.fromCharCode((c1 << 2) | (c2 >> 4));
+			ss += String.fromCharCode(((c2 & 0x0F) << 4) | (c3 >> 2));
+			ss += String.fromCharCode(((c3 & 0x3) << 6) | c4);
+	 }
+    ss = escape(zip_inflate(ss));
+	 return decodeURIComponent(ss);
+}
+
+"
+]
+
+{ #category : #'*PUGizmo' }
+String >> _decodeURIComponent [
+	"Like javascript's encodeURIComponent function"
+
+	^ ZnResourceMetaUtils decodePercent: self
+]
+
+{ #category : #'*PUGizmo' }
 String >> _encode [
 	"Ported from https://github.com/dougn/python-plantuml/blob/master/plantuml.py"
 
@@ -68,6 +111,42 @@ String >> _encode6bit: bCopy [
 ]
 
 { #category : #'*PUGizmo' }
+String >> _escape [
+	"Like javascript's escape (encodeURI) function"
+
+	^ ZnResourceMetaUtils
+		encodePercent: self
+		safeSet: #rfc3986SafeSet
+		encoder: ZnCharacterEncoder utf8
+]
+
+{ #category : #'*PUGizmo' }
+String >> _magicCodeFromURL [
+	^ (self copyWithRegex: 'http.+/' matchesIgnoringCaseReplacedWith: '')
+		copyWithRegex: '(.png|.jpg)'
+		matchesIgnoringCaseReplacedWith: ''
+]
+
+{ #category : #'*PUGizmo' }
+String >> copyWithRegex: rxString matchesIgnoringCaseReplacedWith: aString [
+
+	^rxString asRegexIgnoringCase 
+		copy: self replacingMatchesWith: aString
+]
+
+{ #category : #'*PUGizmo' }
+String >> pkunzipped [
+	"Use the ZLibReadStream to get a DEFLATE function from PKTools"
+
+	"| magic1 magic2 |
+	magic1 := (self at: 1) asInteger.
+	magic2 := (self at: 2) asInteger.
+	(magic1 = 16r1F and: [ magic2 = 16r8B ])
+		ifFalse: [ ^ self ]."
+	^ (ZipReadStream on: self) upToEnd
+]
+
+{ #category : #'*PUGizmo' }
 String >> pkzipped [
 	"Use the ZLibWriteStream to get a DEFLATE function from PKTools"
 
@@ -84,7 +163,25 @@ String >> plantDeflateAndEncode [
 	"Ported from https://github.com/dougn/python-plantuml/blob/master/plantuml.py"
 
 	| zlibbedStr compressedString |
-	zlibbedStr := self pkzipped.
+	zlibbedStr := self convertToSystemString pkzipped.
+	"Remove the compression type and CRC (to save space?)"
 	compressedString := zlibbedStr copyFrom: 3 to: zlibbedStr size - 4.
 	^ compressedString _encode
+	"^ zlibbedStr"
+]
+
+{ #category : #'*PUGizmo' }
+String >> plantUrlStringToPlantSourceString [
+	"Taken from PlantUML Gizmo code (in Javascript)"
+	"get only the magic code part"
+	| magicCode decoded escaped inflated |
+	magicCode := self _magicCodeFromURL.
+	magicCode crLog.
+	decoded := "'x^' , "magicCode _decode64.
+	decoded crLog.
+	inflated := decoded pkunzipped.
+	inflated crLog.
+	escaped := inflated _escape.
+	escaped crLog.
+	^ escaped _decodeURIComponent convertFromSystemString
 ]
