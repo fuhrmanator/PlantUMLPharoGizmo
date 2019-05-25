@@ -3,30 +3,29 @@
 
 Here's an example: ""
 
-codePart := ('@startuml' , String cr ,
-'class Banana #yellow' , String cr ,
-'@enduml') plantDeflateAndEncode.
+plantUMLSource := ('@startuml' , String cr ,
+'skinparam style strictuml' , String cr ,
+'skinparam backgroundcolor transparent' , String cr ,
+'skinparam classbackgroundcolor Yellow/LightYellow' , String cr ,
+'class Banana' , String cr ,
+'note right #red: Ceci n''est pas\nune banane. ' , String cr ,
+'@enduml').
+
+codePart := plantUMLSource plantDeflateAndEncode.
 
 serverUrl := 'https://www.plantuml.com/plantuml/img/', codePart.
 (ZnEasy getPng: serverUrl) asMorph openInWindow.
 
+""Get the Source back from a URL""
+recoveredSource := serverUrl plantUrlStringToPlantSourceString.
+
+self assert: recoveredSource equals: plantUMLSource.
 
 ""Mind map""
 
-codePart := ('@startmindmap' , String cr,
-'* Debian' , String cr,
-'** Ubuntu' , String cr,
-'*** Linux Mint' , String cr,
-'*** Kubuntu' , String cr,
-'*** Lubuntu' , String cr,
-'*** KDE Neon' , String cr,
-'** LMDE' , String cr,
-'** SolydXK' , String cr,
-'** SteamOS' , String cr,
-'** Raspbian with a very long name' , String cr,
-'*** <s>Raspmbc</s> => OSMC' , String cr,
-'*** <s>Raspyfi</s> => Volumio' , String cr,
-'@endmindmap') plantDeflateAndEncode.
+plantUMLSource := Character cr join: #('@startmindmap' '* Debian' '** Ubuntu' '*** Linux Mint' '*** Kubuntu' '*** Lubuntu' '*** KDE Neon' '** LMDE' '** SolydXK' '** SteamOS' '** Raspbian with a very long name' '*** <s>Raspmbc</s> => OSMC' '*** <s>Raspyfi</s> => Volumio' '@endmindmap').
+
+codePart := plantUMLSource plantDeflateAndEncode.
 
 serverUrl := 'https://www.plantuml.com/plantuml/img/', codePart.
 (ZnEasy getPng: serverUrl) asMorph openInWindow.
