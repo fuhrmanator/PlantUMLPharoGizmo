@@ -5,18 +5,18 @@ String >> _decode64 [
 	"Taken from PlantUML Gizmo code (in Javascript)"
 	| i c1 c2 c3 c4 ss |
 	i := 0.
-	ss := ''.
+	ss := WriteStream on: (String new).
 	[ i < self size ]
 		whileTrue: [
 			c1 := (self at: i+1) _decode6bit. "var c1 = decode6bit(data.substring(i,i+1));"
 			c2 := (self at: i+2) _decode6bit. "var c2 = decode6bit(data.substring(i+1,i+2));"
 			c3 := (self at: i+3) _decode6bit. "var c3 = decode6bit(data.substring(i+2,i+3));"
 			c4 := (self at: i+4) _decode6bit. "var c4 = decode6bit(data.substring(i+3,i+4));"
-			ss := ss , (Character value: ((c1 << 2) | (c2 >> 4))) asString. "ss += String.fromCharCode((c1 << 2) | (c2 >> 4));"
-			ss := ss , (Character value: (((c2 & 16r0F) << 4) | (c3 >> 2))) asString. "ss += String.fromCharCode(((c2 & 0x0F) << 4) | (c3 >> 2));"
-			ss := ss , (Character value: (((c3 & 16r3) << 6) | c4)) asString. "ss += String.fromCharCode(((c3 & 0x3) << 6) | c4);"
+			ss nextPutAll: (Character value: ((c1 << 2) | (c2 >> 4))) asString. "ss += String.fromCharCode((c1 << 2) | (c2 >> 4));"
+			ss nextPutAll: (Character value: (((c2 & 16r0F) << 4) | (c3 >> 2))) asString. "ss += String.fromCharCode(((c2 & 0x0F) << 4) | (c3 >> 2));"
+			ss nextPutAll: (Character value: (((c3 & 16r3) << 6) | c4)) asString. "ss += String.fromCharCode(((c3 & 0x3) << 6) | c4);"
 			i := i + 4 ].
-	^ ss
+	^ ss contents
 "function decode64(data) {
 	 var pos = 0;
 	 var ss = "";
@@ -48,28 +48,26 @@ String >> _encode [
 	"Ported from https://github.com/dougn/python-plantuml/blob/master/plantuml.py"
 
 	| res i |
-	res := ''.
+	res := WriteStream on: (String new).
 	i := 0.
 	[ i < self size ]
 		whileTrue: [ i + 2 = self size
-				ifTrue: [ res := res
-						,
+				ifTrue: [ res nextPutAll:
 							(self
 								_encode3bytes: (self at: i + 1) asInteger
 								arg2: (self at: i + 2) asInteger
 								arg3: 0) ]
 				ifFalse: [ i + 1 = self size
-						ifTrue: [ res := res
-								,
+						ifTrue: [ res nextPutAll:
 									(self _encode3bytes: (self at: i + 1) asInteger arg2: 0 arg3: 0) ]
-						ifFalse: [ res := res
-								,
+						ifFalse: [ res nextPutAll:
 									(self
 										_encode3bytes: (self at: i + 1) asInteger
 										arg2: (self at: i + 2) asInteger
 										arg3: (self at: i + 3) asInteger) ] ].
 			i := i + 3 ].
-	^ res
+		res close.
+	^ res contents
 ]
 
 { #category : #'*PUGizmo' }
@@ -81,12 +79,12 @@ String >> _encode3bytes: b1 arg2: b2 arg3: b3 [
 	c2 := (b1 bitAnd: 16r3) << 4 bitOr: b2 >> 4.	"c2 = ((b1 & 0x3) << 4) | (b2 >> 4);"
 	c3 := (b2 bitAnd: 16rF) << 2 bitOr: b3 >> 6.	"c3 = ((b2 & 0xF) << 2) | (b3 >> 6);"
 	c4 := b3 bitAnd: 16r3F.	"c4 = b3 & 0x3F;"
-	res := ''.	"res = '';"
-	res := res , (self _encode6bit: (c1 bitAnd: 16r3F)).	"res += _encode6bit(c1 & 0x3F);"
-	res := res , (self _encode6bit: (c2 bitAnd: 16r3F)).	"res += _encode6bit(c2 & 0x3F);"
-	res := res , (self _encode6bit: (c3 bitAnd: 16r3F)).	"res += _encode6bit(c3 & 0x3F);"
-	res := res , (self _encode6bit: (c4 bitAnd: 16r3F)).	"res += _encode6bit(c4 & 0x3F);"
-	^ res	"return res;"
+	res := WriteStream on: (String new).	"res = '';"
+	res nextPutAll: (self _encode6bit: (c1 bitAnd: 16r3F)).	"res += _encode6bit(c1 & 0x3F);"
+	res nextPutAll: (self _encode6bit: (c2 bitAnd: 16r3F)).	"res += _encode6bit(c2 & 0x3F);"
+	res nextPutAll: (self _encode6bit: (c3 bitAnd: 16r3F)).	"res += _encode6bit(c3 & 0x3F);"
+	res nextPutAll: (self _encode6bit: (c4 bitAnd: 16r3F)).	"res += _encode6bit(c4 & 0x3F);"
+	^ res contents	"return res;"
 ]
 
 { #category : #'*PUGizmo' }
@@ -176,12 +174,8 @@ String >> plantUrlStringToPlantSourceString [
 	"get only the magic code part"
 	| magicCode decoded escaped inflated |
 	magicCode := self _magicCodeFromURL.
-	magicCode crLog.
-	decoded := "'x^' , "magicCode _decode64.
-	decoded crLog.
+	decoded := magicCode _decode64.
 	inflated := decoded pkunzipped.
-	inflated crLog.
 	escaped := inflated _escape.
-	escaped crLog.
 	^ escaped _decodeURIComponent convertFromSystemString
 ]
