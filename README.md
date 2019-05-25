@@ -3,8 +3,6 @@ Pharo support for PlantUML.
 
 ### TODO: 
 
-- make it work with Streams rather than Strings.
-- support decode and inflate
 - add a Spec GUI similar to PlantText.com
 
 ## Example
@@ -12,32 +10,34 @@ Pharo support for PlantUML.
 ### Simple class diagram
 
 ```smalltalk
-codePart := ('@startuml' , String cr ,
-'class Banana #yellow' , String cr ,
-'@enduml') plantDeflateAndEncode.
+plantUMLSource := ('@startuml' , String cr ,
+'skinparam style strictuml' , String cr ,
+'skinparam backgroundcolor transparent' , String cr ,
+'skinparam classbackgroundcolor Yellow/LightYellow' , String cr ,
+'class Banana' , String cr ,
+'note right #red: Ceci n''est pas\nune banane. ' , String cr ,
+'@enduml').
+
+codePart := plantUMLSource plantDeflateAndEncode.
+
 serverUrl := 'https://www.plantuml.com/plantuml/img/', codePart.
 (ZnEasy getPng: serverUrl) asMorph openInWindow.
+
+"Get the Source back from a URL"
+recoveredSource := serverUrl plantUrlStringToPlantSourceString.
+
+self assert: recoveredSource equals: plantUMLSource.
 ```
 
-![Class diagram](https://www.plantuml.com/plantuml/img/SoWkIImgAStDuKtEIImkLd1Ap0D21UNAr9oS_79UXzIy5A0a0000)
+![Class diagram](https://www.plantuml.com/plantuml/img/NOv12i9034LFC7S8kEXEzwwARhs0u2REX3eqpPGaWtXxeswaVFW4teEVqHpL-yB9vYehAYvW_cAArfetv8vvdhHrARbnKt15iK0a_cTbHhEjUYNczZnSwlJmtvs-7fnG8acQ4-Y7mawf7E5CkO8CP0uhsaswKEo7Itj88qc9rzu0)
 
 ### Mind map
 
 ```smalltalk
-codePart := ('@startmindmap' , String cr,
-'* Debian' , String cr,
-'** Ubuntu' , String cr,
-'*** Linux Mint' , String cr,
-'*** Kubuntu' , String cr,
-'*** Lubuntu' , String cr,
-'*** KDE Neon' , String cr,
-'** LMDE' , String cr,
-'** SolydXK' , String cr,
-'** SteamOS' , String cr,
-'** Raspbian with a very long name' , String cr,
-'*** <s>Raspmbc</s> => OSMC' , String cr,
-'*** <s>Raspyfi</s> => Volumio' , String cr,
-'@endmindmap') plantDeflateAndEncode.
+plantUMLSource := Character cr join: #('@startmindmap' '* Debian' '** Ubuntu' '*** Linux Mint' '*** Kubuntu' '*** Lubuntu' '*** KDE Neon' '** LMDE' '** SolydXK' '** SteamOS' '** Raspbian with a very long name' '*** <s>Raspmbc</s> => OSMC' '*** <s>Raspyfi</s> => Volumio' '@endmindmap').
+
+codePart := plantUMLSource plantDeflateAndEncode.
+
 serverUrl := 'https://www.plantuml.com/plantuml/img/', codePart.
 (ZnEasy getPng: serverUrl) asMorph openInWindow.
 ```
