@@ -34,5 +34,5 @@ serverUrl := 'https://www.plantuml.com/plantuml/img/', codePart.
 Class {
 	#name : #PUGizmo,
 	#superclass : #Object,
-	#category : #PUGizmo
+	#category : #'PUGizmo-Core'
 }
