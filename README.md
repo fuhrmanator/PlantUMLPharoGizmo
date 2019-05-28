@@ -1,6 +1,8 @@
 # PlantUMLPharoGizmo
 Pharo support for PlantUML.
 
+[![Demo video of prototype](http://img.youtube.com/vi/fHCcYSa6VhU/0.jpg?)](https://www.youtube.com/watch?v=fHCcYSa6VhU "Demo of PlantUML Gizmo prototype in Pharo with Spec GUI")
+
 ### TODO: 
 
 - add a Spec GUI similar to PlantText.com
