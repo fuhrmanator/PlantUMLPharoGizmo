@@ -139,7 +139,7 @@ PUGizmo >> initializeWindow: aWindowPresenter [
 { #category : #api }
 PUGizmo >> loadUML: aServerUrl [
 	aServerUrl
-	ifEmpty:[ image image:nil ]
+		ifEmpty: [ image image: nil ]
 		ifNotEmpty: [ [ image image: (ZnEasy getPng: aServerUrl) ]
 				ensure: [ imageURL text: aServerUrl ] ]
 ]
