@@ -1,6 +1,8 @@
 # PlantUMLPharoGizmo
 Pharo support for PlantUML.
 
+> Note: The GUI part of this project is done in Spec 2, which works best in Pharo 8.
+
 [![Demo video of prototype](http://img.youtube.com/vi/fHCcYSa6VhU/0.jpg?1)](https://www.youtube.com/watch?v=fHCcYSa6VhU "Demo of PlantUML Gizmo prototype in Pharo with Spec GUI")
 
 ### TODO: 
