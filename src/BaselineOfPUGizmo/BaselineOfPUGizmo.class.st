@@ -10,15 +10,13 @@ BaselineOfPUGizmo >> baseline: spec [
 	spec
 		for: #'pharo8.x'
 		do: [ spec
-				package: 'PUGizmo-GUISpec2';
-				package: 'PUGizmo-Extensions'
-				].
+				package: 'PUGizmo';
+				package: 'PUGizmo-GUISpec2' with: [ spec requires: #('PUGizmo') ] ].
 	spec
 		for: #'pharo7.x'
 		do: [ spec
-				package: 'PUGizmo-GUISpec1';
-				package: 'PUGizmo-Extensions'
-			 ]
+				package: 'PUGizmo';
+				package: 'PUGizmo-GUISpec1'  with: [ spec requires: #('PUGizmo') ]]
 ]
 
 { #category : #accessing }
