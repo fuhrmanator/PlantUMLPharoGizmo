@@ -10,8 +10,7 @@ BaselineOfPUGizmo >> baseline: spec [
 	spec
 		for: #common
 		do: [ spec
-				baseline: 'PUGizmo'
-				with: [ spec repository: 'github://fuhrmanator/PUGizmo' ] ]
+				package: 'PUGizmo' ]
 ]
 
 { #category : #accessing }
