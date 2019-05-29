@@ -32,7 +32,7 @@ serverUrl := 'https://www.plantuml.com/plantuml/img/', codePart.
 
 "
 Class {
-	#name : #PUGizmo,
+	#name : #PUGizmoSpec2,
 	#superclass : #ComposablePresenter,
 	#instVars : [
 		'text',
@@ -41,11 +41,11 @@ Class {
 		'changeToImageButton',
 		'changeToTextButton'
 	],
-	#category : #PUGizmo
+	#category : #'PUGizmo-GUISpec2'
 }
 
 { #category : #specs }
-PUGizmo class >> defaultSpec [
+PUGizmoSpec2 class >> defaultSpec [
 	^ SpecPanedLayout newHorizontal
 		add:
 			(SpecBoxLayout newVertical
@@ -63,14 +63,14 @@ PUGizmo class >> defaultSpec [
 ]
 
 { #category : #examples }
-PUGizmo class >> open [
+PUGizmoSpec2 class >> open [
 	<example>
 	self new 
 		openWithSpec
 ]
 
 { #category : #api }
-PUGizmo >> changeToImage [
+PUGizmoSpec2 >> changeToImage [
 	self
 		loadUML:
 			'https://www.plantuml.com/plantuml/img/'
@@ -79,28 +79,28 @@ PUGizmo >> changeToImage [
 ]
 
 { #category : #accessing }
-PUGizmo >> changeToImageButton [ 
+PUGizmoSpec2 >> changeToImageButton [ 
 ^changeToImageButton 
 
 ]
 
 { #category : #api }
-PUGizmo >> changeToText [
+PUGizmoSpec2 >> changeToText [
 	text text: imageURL text plantUrlStringToPlantSourceString
 ]
 
 { #category : #accessing }
-PUGizmo >> changeToTextButton [
+PUGizmoSpec2 >> changeToTextButton [
 	^ changeToTextButton
 ]
 
 { #category : #accessing }
-PUGizmo >> imageURL [
+PUGizmoSpec2 >> imageURL [
 	^ imageURL
 ]
 
 { #category : #initialization }
-PUGizmo >> initializePresenter [
+PUGizmoSpec2 >> initializePresenter [
 	text whenTextChangedDo: [ self manageButtons ].
 	imageURL whenTextChangedDo: [ self manageButtons ].
 	imageURL acceptBlock: [ :url | self loadUML: url ].
@@ -109,7 +109,7 @@ PUGizmo >> initializePresenter [
 ]
 
 { #category : #initialization }
-PUGizmo >> initializeWidgets [
+PUGizmoSpec2 >> initializeWidgets [
 	text := self newText autoAccept: true.
 	image := self newImage.
 	imageURL := self newTextInput placeholder: 'URL'.
@@ -128,7 +128,7 @@ PUGizmo >> initializeWidgets [
 ]
 
 { #category : #initialization }
-PUGizmo >> initializeWindow: aWindowPresenter [
+PUGizmoSpec2 >> initializeWindow: aWindowPresenter [
 	| fontWidth rowHeight |
 	fontWidth := StandardFonts defaultFont widthOfString: 'M'.
 	rowHeight := self class inputTextHeight.
@@ -137,7 +137,7 @@ PUGizmo >> initializeWindow: aWindowPresenter [
 ]
 
 { #category : #api }
-PUGizmo >> loadUML: aServerUrl [
+PUGizmoSpec2 >> loadUML: aServerUrl [
 	aServerUrl
 		ifEmpty: [ image image: nil ]
 		ifNotEmpty: [ [ image image: (ZnEasy getPng: aServerUrl) ]
@@ -145,7 +145,7 @@ PUGizmo >> loadUML: aServerUrl [
 ]
 
 { #category : #'button state' }
-PUGizmo >> manageButtons [
+PUGizmoSpec2 >> manageButtons [
 	text text
 		ifEmpty: [ changeToImageButton disable ];
 		ifNotEmpty: [ changeToImageButton enable ].
@@ -155,5 +155,5 @@ PUGizmo >> manageButtons [
 ]
 
 { #category : #accessing }
-PUGizmo >> text [ ^text
+PUGizmoSpec2 >> text [ ^text
 ]

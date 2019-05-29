@@ -1,20 +1,20 @@
 Class {
-	#name : #PUGizmoTest,
+	#name : #PUGizmoSpec2Test,
 	#superclass : #SpecTestCase,
 	#instVars : [
 		'plantUMLSource',
 		'url'
 	],
-	#category : #PUGizmo
+	#category : #'PUGizmo-GUISpec2'
 }
 
 { #category : #running }
-PUGizmoTest >> classToTest [
-	^PUGizmo 
+PUGizmoSpec2Test >> classToTest [
+	^PUGizmoSpec2 
 ]
 
 { #category : #setup }
-PUGizmoTest >> setUp [
+PUGizmoSpec2Test >> setUp [
 	super setUp.
 	plantUMLSource := '@startuml' , String cr
 		, 'skinparam style strictuml' , String cr
@@ -27,14 +27,14 @@ PUGizmoTest >> setUp [
 ]
 
 { #category : #tests }
-PUGizmoTest >> testChangeToImageButton [
+PUGizmoSpec2Test >> testChangeToImageButton [
 	presenter text text: plantUMLSource.
 	presenter changeToImageButton performAction.
 	self assert: presenter imageURL text asString equals:url.
 ]
 
 { #category : #tests }
-PUGizmoTest >> testChangeToTextButton [
+PUGizmoSpec2Test >> testChangeToTextButton [
 	presenter imageURL text: url.
 	presenter changeToTextButton performAction.
 	self assert: presenter text text asString equals: plantUMLSource.
@@ -42,7 +42,7 @@ PUGizmoTest >> testChangeToTextButton [
 ]
 
 { #category : #tests }
-PUGizmoTest >> testManageButtons [
+PUGizmoSpec2Test >> testManageButtons [
 	self deny: presenter changeToImageButton isEnabled.
 	self deny: presenter changeToTextButton isEnabled.
 	presenter text text: plantUMLSource.
