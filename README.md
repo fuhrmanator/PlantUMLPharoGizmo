@@ -1,13 +1,22 @@
 # PlantUMLPharoGizmo
 Pharo support for PlantUML.
 
-> Note: The GUI part of this project is done in Spec 2, which works best in Pharo 8.
+> Note: The GUI part of this project was initially done in Spec 2, which works best in Pharo 8. However, the baseline will load a GUI that works with Pharo 7. 
 
 [![Demo video of prototype](http://img.youtube.com/vi/fHCcYSa6VhU/0.jpg?1)](https://www.youtube.com/watch?v=fHCcYSa6VhU "Demo of PlantUML Gizmo prototype in Pharo with Spec GUI")
 
 ### TODO: 
 
 - add a Spec GUI similar to PlantText.com
+
+## Loading
+
+```Smalltalk
+Metacello new
+  repository: 'github://fuhrmanator/PlantUMLPharoGizmo/src';
+  baseline: 'PUGizmo';
+  load.
+```
 
 ## Example
 
