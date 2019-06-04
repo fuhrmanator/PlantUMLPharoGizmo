@@ -80,7 +80,7 @@ PUGizmoSpec1 >> imageURL [
 PUGizmoSpec1 >> initializePresenter [
 	text whenTextChanged: [ self manageButtons ].
 	imageURL whenTextChanged: [ self manageButtons ].
-	imageURL acceptBlock: [ :url | self loadUML: url ].
+	imageURL acceptBlock: [ :urlText | self loadUML: urlText ].
 	changeToImageButton action: [ self changeToImage ].
 	changeToTextButton action: [ self changeToText ]
 ]
@@ -105,11 +105,11 @@ PUGizmoSpec1 >> initializeWidgets [
 ]
 
 { #category : #api }
-PUGizmoSpec1 >> loadUML: aServerUrl [
-	aServerUrl
+PUGizmoSpec1 >> loadUML: aServerUrlText [
+	aServerUrlText
 		ifEmpty: [ image image: nil ]
-		ifNotEmpty: [ [ image image: (ZnEasy getPng: aServerUrl) ]
-				ensure: [ imageURL text: aServerUrl ] ]
+		ifNotEmpty: [ [ image image: (ZnEasy getPng: aServerUrlText asUrl ) ]
+				ensure: [ imageURL text: aServerUrlText ] ]
 ]
 
 { #category : #'button state' }
