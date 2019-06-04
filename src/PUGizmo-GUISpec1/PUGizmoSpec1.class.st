@@ -78,8 +78,8 @@ PUGizmoSpec1 >> imageURL [
 
 { #category : #initialization }
 PUGizmoSpec1 >> initializePresenter [
-	text whenTextChangedDo: [ self manageButtons ].
-	imageURL whenTextChangedDo: [ self manageButtons ].
+	text whenTextChanged: [ self manageButtons ].
+	imageURL whenTextChanged: [ self manageButtons ].
 	imageURL acceptBlock: [ :url | self loadUML: url ].
 	changeToImageButton action: [ self changeToImage ].
 	changeToTextButton action: [ self changeToText ]
@@ -89,7 +89,7 @@ PUGizmoSpec1 >> initializePresenter [
 PUGizmoSpec1 >> initializeWidgets [
 	text := self newText autoAccept: true.
 	image := self newImage.
-	imageURL := self newTextInput placeholder: 'URL'.
+	imageURL := self newTextInput ghostText: 'URL'.
 	changeToImageButton := self newButton disable
 		label: 'Get the UML';
 		icon: (self iconNamed: #glamorousRight).
