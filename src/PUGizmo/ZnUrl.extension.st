@@ -2,6 +2,12 @@ Extension { #name : #ZnUrl }
 
 { #category : #'*PUGizmo' }
 ZnUrl >> isValid [
+	"This is not very precise - but it's better than nothing"
+	^ '^(http|https)\:\/\/.+\..+$' asRegex matches: self asString
+]
+
+{ #category : #'*PUGizmo' }
+ZnUrl >> isValidViaPerl [
 	"Use LibC's perl to run a regex to validate the URL. The validation comes from https://github.com/segmentio/is-url/blob/master/index.js"
 	| result outputFile command |
 	outputFile := '/tmp/isValidURL_output.txt'.
