@@ -7,7 +7,7 @@ Pharo support for PlantUML.
 
 ### TODO: 
 
-- add a Spec GUI similar to PlantText.com
+- drop-down menu of example diagrams
 
 ## Loading
 
