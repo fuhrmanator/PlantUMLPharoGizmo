@@ -108,8 +108,16 @@ PUGizmoSpec1 >> initializeWidgets [
 PUGizmoSpec1 >> loadUML: aServerUrlText [
 	aServerUrlText
 		ifEmpty: [ image image: nil ]
-		ifNotEmpty: [ [ image image: (ZnEasy getPng: aServerUrlText asUrl ) ]
-				ensure: [ imageURL text: aServerUrlText ] ]
+		ifNotEmpty: [ | theUrl |
+			theUrl := aServerUrlText asUrl.
+			theUrl isValid
+				ifTrue: [ [ image image: (ZnEasy getPng: theUrl).image autoScaleHolder value: false ]
+					on: ZnHttpUnsuccessful do: [ :ex | image image: (ImageReadWriter formFromStream: ex response entity readStream). image autoScaleHolder value: true 
+						"Also maybe show error message in text form"
+						"self headers at: 'X-Plantuml-Diagram-Error'"
+						"self headers at: 'X-Plantuml-Diagram-Error-Line'"
+						 ]
+						"ensure: [ imageURL text: aServerUrlText ]" ] ]
 ]
 
 { #category : #'button state' }
