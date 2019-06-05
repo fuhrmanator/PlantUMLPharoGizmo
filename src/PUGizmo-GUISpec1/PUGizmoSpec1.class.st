@@ -111,13 +111,14 @@ PUGizmoSpec1 >> loadUML: aServerUrlText [
 		ifNotEmpty: [ | theUrl |
 			theUrl := aServerUrlText asUrl.
 			theUrl isValid
-				ifTrue: [ [ image image: (ZnEasy getPng: theUrl).image autoScaleHolder value: false ]
+				ifTrue: [ [[ image image: (ZnEasy getPng: theUrl).image autoScaleHolder value: false ]
 					on: ZnHttpUnsuccessful do: [ :ex | image image: (ImageReadWriter formFromStream: ex response entity readStream). image autoScaleHolder value: true 
 						"Also maybe show error message in text form"
 						"self headers at: 'X-Plantuml-Diagram-Error'"
 						"self headers at: 'X-Plantuml-Diagram-Error-Line'"
-						 ]
-						"ensure: [ imageURL text: aServerUrlText ]" ] ]
+						 ]]
+					"Must update the URL in case it's dirty from a change"
+						ensure: [ imageURL text: aServerUrlText ] ] ]
 ]
 
 { #category : #'button state' }
