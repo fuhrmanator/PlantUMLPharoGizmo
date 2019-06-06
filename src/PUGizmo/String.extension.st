@@ -126,6 +126,16 @@ String >> _magicCodeFromURL [
 ]
 
 { #category : #'*PUGizmo' }
+String >> asPlantUMLKey [
+	^self plantDeflateAndEncode
+]
+
+{ #category : #'*PUGizmo' }
+String >> asPlantUMLSource [
+	^self plantUrlStringToPlantSourceString.
+]
+
+{ #category : #'*PUGizmo' }
 String >> copyWithRegex: rxString matchesIgnoringCaseReplacedWith: aString [
 
 	^rxString asRegexIgnoringCase 
