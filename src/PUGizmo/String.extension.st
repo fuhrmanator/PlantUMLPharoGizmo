@@ -189,3 +189,12 @@ String >> plantUrlStringToPlantSourceString [
 	escaped := inflated _escape.
 	^ escaped _decodeURIComponent convertFromSystemString
 ]
+
+{ #category : #'*PUGizmo' }
+String class >> randomOfSize: anInteger [
+	^ self
+		streamContents: [ :s | 
+			anInteger
+				timesRepeat: [ s
+						nextPut: (Character codePoint: ((97 to: 122) union: #(32)) atRandom) ] ]
+]

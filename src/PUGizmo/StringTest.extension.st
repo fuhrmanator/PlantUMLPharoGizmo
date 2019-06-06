@@ -17,8 +17,19 @@ StringTest >> testPlantDeflateAndEncode [
 { #category : #'*PUGizmo' }
 StringTest >> testPlantTextRoundTrip [
 	| source |
-	source := (Character cr join: #('@startmindmap' '* Debian' '** Ubuntu' '*** Linux Mint' '*** Kubuntu' '*** Lubuntu' '*** KDE Neon' '** LMDE' '** SolydXK' '** SteamOS' '** Raspbian with a very long name' '*** <s>Raspmbc</s> => OSMC' '*** <s>Raspyfi</s> => Volumio' '@endmindmap')).
-	self assert: source plantDeflateAndEncode plantUrlStringToPlantSourceString equals: source.
+	source := Character cr
+		join:
+			#('@startmindmap' '* Debian' '** Ubuntu' '*** Linux Mint' '*** Kubuntu' '*** Lubuntu' '*** KDE Neon' '** LMDE' '** SolydXK' '** SteamOS' '** Raspbian with a very long name' '*** <s>Raspmbc</s> => OSMC' '*** <s>Raspyfi</s> => Volumio' '@endmindmap').
+	self
+		assert: source plantDeflateAndEncode asPlantUMLSource
+		equals: source.
+	"Test with ever increasing string sizes"
+	(100 to: 10000 by: 1)
+		do: [ :size | 
+			source := String randomOfSize: size.
+			self
+				assert: source asPlantUMLKey asPlantUMLSource
+				equals: source ]
 ]
 
 { #category : #'*PUGizmo' }
