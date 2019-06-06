@@ -132,7 +132,11 @@ String >> asPlantUMLKey [
 
 { #category : #'*PUGizmo' }
 String >> asPlantUMLSource [
-	^self plantUrlStringToPlantSourceString.
+	| decoded inflated escaped |
+	decoded := self _decode64.
+	inflated := decoded pkunzipped.
+	escaped := inflated _escape.
+	^ escaped _decodeURIComponent convertFromSystemString
 ]
 
 { #category : #'*PUGizmo' }
@@ -182,12 +186,9 @@ String >> plantDeflateAndEncode [
 String >> plantUrlStringToPlantSourceString [
 	"Taken from PlantUML Gizmo code (in Javascript)"
 	"get only the magic code part"
-	| magicCode decoded escaped inflated |
+	| magicCode |
 	magicCode := self _magicCodeFromURL.
-	decoded := magicCode _decode64.
-	inflated := decoded pkunzipped.
-	escaped := inflated _escape.
-	^ escaped _decodeURIComponent convertFromSystemString
+	^ magicCode asPlantUMLSource
 ]
 
 { #category : #'*PUGizmo' }
