@@ -132,6 +132,14 @@ String >> asHexNoRadical [
 ]
 
 { #category : #'*PUGizmo' }
+String >> asHexNoRadical2 [
+	"'A' asHex >>> '16r41'"
+	"'AA' asHex >>> '16r4116r41'"
+	^ self class new: self size * 4 streamContents: [ :stream |
+		self do: [ :ch | stream nextPutAll: (ch asInteger printStringBase: 16 nDigits: 2); nextPut: Character space ]]
+]
+
+{ #category : #'*PUGizmo' }
 String >> asPlantUMLKey [
 	^self plantDeflateAndEncode
 ]
@@ -187,7 +195,7 @@ String >> plantDeflateAndEncode [
 "	'zlibbed:' crLog.
 	(zlibbedStr asHex copyWithRegex: '16r' matchesReplacedWith: '') crLog."
 	"Remove the compression type and CRC (to save space?)"
-	compressedString := zlibbedStr copyFrom: 3 to: zlibbedStr size - 5.
+	compressedString := zlibbedStr copyFrom: 3 to: zlibbedStr size - 4.
 "	(compressedString asHex copyWithRegex: '16r' matchesReplacedWith: '') crLog."
 	^ compressedString _encode
 ]
