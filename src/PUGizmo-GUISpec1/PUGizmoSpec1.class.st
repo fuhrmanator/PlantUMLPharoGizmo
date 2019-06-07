@@ -6,7 +6,8 @@ Class {
 		'image',
 		'imageURL',
 		'changeToImageButton',
-		'changeToTextButton'
+		'changeToTextButton',
+		'imageVerification'
 	],
 	#category : #'PUGizmo-GUISpec1'
 }
@@ -17,12 +18,16 @@ PUGizmoSpec1 class >> defaultSpec [
 		newColumn: [ :col | 
 			col
 				add: #text;
-				add: #changeToImageButton height: self toolbarHeight ];
+				add: #changeToImageButton height: self toolbarHeight ]
+			left: 0
+			right: 0.7;
 		newColumn: [ :col | 
 			col
 				add: #imageURL height: self toolbarHeight;
 				add: #image;
-				add: #changeToTextButton height: self toolbarHeight ];
+				add: #changeToTextButton height: self toolbarHeight ]
+			left: 0.3
+			right: 0;
 		yourself
 ]
 
@@ -33,24 +38,10 @@ PUGizmoSpec1 class >> open [
 		openWithSpec
 ]
 
-{ #category : #api }
-PUGizmoSpec1 >> changeToImage [
-	self
-		loadUML:
-			'https://www.plantuml.com/plantuml/img/'
-				, text text asString plantDeflateAndEncode.
-	
-]
-
 { #category : #accessing }
 PUGizmoSpec1 >> changeToImageButton [ 
 ^changeToImageButton 
 
-]
-
-{ #category : #api }
-PUGizmoSpec1 >> changeToText [
-	text text: imageURL text plantUrlStringToPlantSourceString
 ]
 
 { #category : #accessing }
@@ -79,14 +70,17 @@ PUGizmoSpec1 >> imageURL [
 { #category : #initialization }
 PUGizmoSpec1 >> initializePresenter [
 	text whenTextChanged: [ self manageButtons ].
-	imageURL whenTextChanged: [ self manageButtons ].
-	imageURL acceptBlock: [ :urlText | self loadUML: urlText ].
-	changeToImageButton action: [ self changeToImage ].
-	changeToTextButton action: [ self changeToText ]
+	imageURL
+		acceptBlock: [ :urlText | self updateWidgets: (PUGizmo loadUML: urlText) ].
+	changeToImageButton
+		action: [ self updateWidgets: (PUGizmo changeToImage: text text asString) ].
+	changeToTextButton
+		action: [ text text: (PUGizmo changeToText: imageURL text) ]
 ]
 
 { #category : #initialization }
 PUGizmoSpec1 >> initializeWidgets [
+	imageVerification := false.
 	text := self newText autoAccept: true.
 	image := self newImage.
 	imageURL := self newTextInput ghostText: 'URL'.
@@ -104,31 +98,14 @@ PUGizmoSpec1 >> initializeWidgets [
 		add: changeToTextButton
 ]
 
-{ #category : #api }
-PUGizmoSpec1 >> loadUML: aServerUrlText [
-	aServerUrlText
-		ifEmpty: [ image image: nil ]
-		ifNotEmpty: [ | theUrl |
-			theUrl := aServerUrlText asUrl.
-			theUrl isValid
-				ifTrue: [ [[ image image: (ZnEasy getPng: theUrl).image autoScaleHolder value: false ]
-					on: ZnHttpUnsuccessful do: [ :ex | image image: (ImageReadWriter formFromStream: ex response entity readStream). image autoScaleHolder value: true 
-						"Also maybe show error message in text form"
-						"self headers at: 'X-Plantuml-Diagram-Error'"
-						"self headers at: 'X-Plantuml-Diagram-Error-Line'"
-						 ]]
-					"Must update the URL in case it's dirty from a change"
-						ensure: [ imageURL text: aServerUrlText ] ] ]
-]
-
 { #category : #'button state' }
 PUGizmoSpec1 >> manageButtons [
 	text text
 		ifEmpty: [ changeToImageButton disable ];
 		ifNotEmpty: [ changeToImageButton enable ].
-		imageURL  text
-		ifEmpty: [ changeToTextButton disable ];
-		ifNotEmpty: [ changeToTextButton enable ]
+	imageVerification
+		ifFalse: [ changeToTextButton disable ];
+		ifTrue: [ changeToTextButton enable ]
 ]
 
 { #category : #accessing }
@@ -138,4 +115,12 @@ PUGizmoSpec1 >> text [ ^text
 { #category : #api }
 PUGizmoSpec1 >> title [ 
 ^'PUGizmo'
+]
+
+{ #category : #update }
+PUGizmoSpec1 >> updateWidgets: aCollection [
+	imageURL text: aCollection first.
+	image image: aCollection second.
+	imageVerification := aCollection third.
+	self manageButtons
 ]
