@@ -73,7 +73,8 @@ PUGizmoSpec2 class >> open [
 PUGizmoSpec2 >> changeToImage [
 	self
 		loadUML:
-			'https://www.plantuml.com/plantuml/img/'
+			"'https://www.plantuml.com/plantuml/img/'"
+			'http://localhost:8080/plantuml/img/'
 				, text text asString plantDeflateAndEncode.
 	
 ]

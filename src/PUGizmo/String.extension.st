@@ -126,6 +126,12 @@ String >> _magicCodeFromURL [
 ]
 
 { #category : #'*PUGizmo' }
+String >> asHexNoRadical [
+	"Don't include the 16r"
+	^self asHex copyWithRegex: '16r' matchesReplacedWith: ''
+]
+
+{ #category : #'*PUGizmo' }
 String >> asPlantUMLKey [
 	^self plantDeflateAndEncode
 ]
@@ -166,8 +172,10 @@ String >> pkzipped [
 	^ String
 		streamContents: [ :stream | 
 			zstream := ZLibWriteStream on: stream.
+			"zstream := GZipWriteStream on: stream."
 			zstream nextPutAll: self.
-			zstream close ]
+			zstream close.
+			zstream encodedStream contents ]
 ]
 
 { #category : #'*PUGizmo' }
@@ -176,10 +184,12 @@ String >> plantDeflateAndEncode [
 
 	| zlibbedStr compressedString |
 	zlibbedStr := self convertToSystemString pkzipped.
+"	'zlibbed:' crLog.
+	(zlibbedStr asHex copyWithRegex: '16r' matchesReplacedWith: '') crLog."
 	"Remove the compression type and CRC (to save space?)"
-	compressedString := zlibbedStr copyFrom: 3 to: zlibbedStr size - 4.
+	compressedString := zlibbedStr copyFrom: 3 to: zlibbedStr size - 5.
+"	(compressedString asHex copyWithRegex: '16r' matchesReplacedWith: '') crLog."
 	^ compressedString _encode
-	"^ zlibbedStr"
 ]
 
 { #category : #'*PUGizmo' }
