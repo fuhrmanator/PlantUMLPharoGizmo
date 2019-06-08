@@ -126,6 +126,25 @@ String >> _magicCodeFromURL [
 ]
 
 { #category : #'*PUGizmo' }
+String >> asCRfromLF [
+	^ self copyWithRegex: '\n' matchesReplacedWith: String cr. 
+]
+
+{ #category : #'*PUGizmo' }
+String >> asHexNoRadical [
+	"Don't include the 16r"
+	^self asHex copyWithRegex: '16r' matchesReplacedWith: ''
+]
+
+{ #category : #'*PUGizmo' }
+String >> asHexNoRadical2 [
+	"'A' asHex >>> '16r41'"
+	"'AA' asHex >>> '16r4116r41'"
+	^ self class new: self size * 4 streamContents: [ :stream |
+		self do: [ :ch | stream nextPutAll: (ch asInteger printStringBase: 16 nDigits: 2) ]]
+]
+
+{ #category : #'*PUGizmo' }
 String >> asPlantUMLKey [
 	^self plantDeflateAndEncode
 ]
@@ -137,6 +156,19 @@ String >> asPlantUMLSource [
 	inflated := decoded pkunzipped.
 	escaped := inflated _escape.
 	^ escaped _decodeURIComponent convertFromSystemString
+]
+
+{ #category : #'*PUGizmo' }
+String >> asUnescapedHTMLString [
+	| unescaped |
+	unescaped := self.
+	{'"' . '&#034;' . '''' . '&#039;' . '&' . '&amp;' . '<' . '&lt;' . '>'.
+	'&gt;' . '\''' . '&quot;' . '''' . '&apos;'}
+		pairsDo: [ :originalString :escapedPattern | 
+			unescaped := unescaped
+				copyWithRegex: escapedPattern
+				matchesReplacedWith: originalString ].
+	^ unescaped
 ]
 
 { #category : #'*PUGizmo' }
@@ -166,8 +198,10 @@ String >> pkzipped [
 	^ String
 		streamContents: [ :stream | 
 			zstream := ZLibWriteStream on: stream.
+			"zstream := GZipWriteStream on: stream."
 			zstream nextPutAll: self.
-			zstream close ]
+			zstream close.
+			zstream encodedStream contents ]
 ]
 
 { #category : #'*PUGizmo' }
@@ -176,10 +210,12 @@ String >> plantDeflateAndEncode [
 
 	| zlibbedStr compressedString |
 	zlibbedStr := self convertToSystemString pkzipped.
+"	'zlibbed:' crLog.
+	(zlibbedStr asHex copyWithRegex: '16r' matchesReplacedWith: '') crLog."
 	"Remove the compression type and CRC (to save space?)"
 	compressedString := zlibbedStr copyFrom: 3 to: zlibbedStr size - 4.
+"	(compressedString asHex copyWithRegex: '16r' matchesReplacedWith: '') crLog."
 	^ compressedString _encode
-	"^ zlibbedStr"
 ]
 
 { #category : #'*PUGizmo' }
