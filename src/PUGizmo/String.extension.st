@@ -126,6 +126,11 @@ String >> _magicCodeFromURL [
 ]
 
 { #category : #'*PUGizmo' }
+String >> asCRfromLF [
+	^ self copyWithRegex: '\n' matchesReplacedWith: String cr. 
+]
+
+{ #category : #'*PUGizmo' }
 String >> asHexNoRadical [
 	"Don't include the 16r"
 	^self asHex copyWithRegex: '16r' matchesReplacedWith: ''
@@ -136,7 +141,7 @@ String >> asHexNoRadical2 [
 	"'A' asHex >>> '16r41'"
 	"'AA' asHex >>> '16r4116r41'"
 	^ self class new: self size * 4 streamContents: [ :stream |
-		self do: [ :ch | stream nextPutAll: (ch asInteger printStringBase: 16 nDigits: 2); nextPut: Character space ]]
+		self do: [ :ch | stream nextPutAll: (ch asInteger printStringBase: 16 nDigits: 2) ]]
 ]
 
 { #category : #'*PUGizmo' }
@@ -151,6 +156,19 @@ String >> asPlantUMLSource [
 	inflated := decoded pkunzipped.
 	escaped := inflated _escape.
 	^ escaped _decodeURIComponent convertFromSystemString
+]
+
+{ #category : #'*PUGizmo' }
+String >> asUnescapedHTMLString [
+	| unescaped |
+	unescaped := self.
+	{'"' . '&#034;' . '''' . '&#039;' . '&' . '&amp;' . '<' . '&lt;' . '>'.
+	'&gt;' . '\''' . '&quot;' . '''' . '&apos;'}
+		pairsDo: [ :originalString :escapedPattern | 
+			unescaped := unescaped
+				copyWithRegex: escapedPattern
+				matchesReplacedWith: originalString ].
+	^ unescaped
 ]
 
 { #category : #'*PUGizmo' }
