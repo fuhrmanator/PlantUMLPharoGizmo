@@ -24,13 +24,12 @@ PUGizmo class >> loadUML: aServerUrlText [
 	message := ''.
 	verification := false.
 	aServerUrlText
-		ifNotEmpty: [ [ [ [ 0 halt.
+		ifNotEmpty: [ [ [ [ 
 			image := ZnEasy getPng: aServerUrlText.
 			verification := true ]
 				on: ZnHttpUnsuccessful
 				do: [ :ex | 
 					| errorMessage lineNumber |
-					0halt.
 					errorMessage := ex response headers
 						at: 'X-Plantuml-Diagram-Error'.
 					lineNumber := ex response headers
@@ -44,7 +43,6 @@ PUGizmo class >> loadUML: aServerUrlText [
 					image := message asMorph imageForm ] ]
 				on: Error
 				do: [ :ex | 
-					0 halt.
 					message := '[This is not a usable URL]'.
 					image := message asMorph imageForm ] ].
 	^ {aServerUrlText.

@@ -115,9 +115,13 @@ PUGizmoSpec2 >> text [ ^text
 
 { #category : #update }
 PUGizmoSpec2 >> updateWidgets: aCollection [
+	| helpMessage |
+	helpMessage := aCollection third.
 	imageURL text: aCollection first.
 	image image: aCollection second.
-	image help: aCollection third.
+	helpMessage = ''
+		ifTrue: [ image help: nil ]
+		ifFalse: [ image help: helpMessage ].
 	imageVerification := aCollection fourth.
 	self manageButtons
 ]

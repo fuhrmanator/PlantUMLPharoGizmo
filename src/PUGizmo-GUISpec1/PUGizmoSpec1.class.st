@@ -119,8 +119,13 @@ PUGizmoSpec1 >> title [
 
 { #category : #update }
 PUGizmoSpec1 >> updateWidgets: aCollection [
+	| helpMessage |
+	helpMessage := aCollection third.
 	imageURL text: aCollection first.
-	image "image":= aCollection second.
-	imageVerification := aCollection third.
+	image image: aCollection second.
+	helpMessage = ''
+		ifTrue: [ image help ]
+		ifFalse: [ image help: helpMessage ].
+	imageVerification := aCollection fourth.
 	self manageButtons
 ]
