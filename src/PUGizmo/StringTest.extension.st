@@ -2,6 +2,7 @@ Extension { #name : #StringTest }
 
 { #category : #'*PUGizmo' }
 StringTest >> sourceFromLocalhost: key [
+	"Use a localhost PlantUML server to get back the source from a key (to test key's validity)"
 	| response content re |
 	response := ZnClient new
 		url: 'http://localhost:8080/plantuml/uml/' , key;
