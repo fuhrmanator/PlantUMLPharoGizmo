@@ -120,7 +120,7 @@ PUGizmoSpec1 >> title [
 { #category : #update }
 PUGizmoSpec1 >> updateWidgets: aCollection [
 	imageURL text: aCollection first.
-	image image: aCollection second.
+	image "image":= aCollection second.
 	imageVerification := aCollection third.
 	self manageButtons
 ]

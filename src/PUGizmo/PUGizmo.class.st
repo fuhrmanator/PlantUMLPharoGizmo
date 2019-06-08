@@ -5,11 +5,11 @@ Class {
 }
 
 { #category : #api }
-PUGizmo class >> changeToImage: aString [
+PUGizmo class >> changeToImage: source [
 	^self
 		loadUML:
 			'https://www.plantuml.com/plantuml/img/'
-				, aString plantDeflateAndEncode
+				, source asPlantUMLKey
 ]
 
 { #category : #api }
@@ -19,24 +19,37 @@ PUGizmo class >> changeToText: aURL [
 
 { #category : #api }
 PUGizmo class >> loadUML: aServerUrlText [
-	| image verification |
+	| message image verification |
 	image := nil.
+	message := ''.
 	verification := false.
 	aServerUrlText
-		ifNotEmpty: [ [ [ [ image := ZnEasy getPng: aServerUrlText.
+		ifNotEmpty: [ [ [ [ 0 halt.
+			image := ZnEasy getPng: aServerUrlText.
 			verification := true ]
 				on: ZnHttpUnsuccessful
 				do: [ :ex | 
-					image := 'Error: ' asMorph imageForm.
-					image := ('[', (ex response headers at: 'X-Plantuml-Diagram-Error'), '] on the line', (ex response headers at: 'X-Plantuml-Diagram-Error-Line')) asMorph imageForm ] ]
+					| errorMessage lineNumber |
+					0halt.
+					errorMessage := ex response headers
+						at: 'X-Plantuml-Diagram-Error'.
+					lineNumber := ex response headers
+						at: 'X-Plantuml-Diagram-Error-Line'.
+					message := 'Error: ' , errorMessage , ' on line '
+						, lineNumber asString.
+					image := message asMorph imageForm ] ]
 				on: ConnectionTimedOut
 				do: [ :ex | 
-					image := '[Connection Timed Out] Please check your connection.'
-						asMorph imageForm ] ]
+					message := '[Connection Timed Out] Please check your connection.'.
+					image := message asMorph imageForm ] ]
 				on: Error
-				do: [ :ex | image := '[This is not a usable URL]' asMorph imageForm ] ].
+				do: [ :ex | 
+					0 halt.
+					message := '[This is not a usable URL]'.
+					image := message asMorph imageForm ] ].
 	^ {aServerUrlText.
 	image.
+	message.
 	verification}
 ]
 
