@@ -28,25 +28,25 @@ PUGizmoSpec1Test >> setUp [
 
 { #category : #tests }
 PUGizmoSpec1Test >> testChangeToImageButton [
-	presenter text text: plantUMLSource.
-	presenter changeToImageButton performAction.
-	self assert: presenter imageURL text asString equals:url.
+	testedInstance text text: plantUMLSource.
+	testedInstance changeToImageButton performAction.
+	self assert: testedInstance imageURL text asString equals:url.
 ]
 
 { #category : #tests }
 PUGizmoSpec1Test >> testChangeToTextButton [
-	presenter imageURL text: url.
-	presenter changeToTextButton performAction.
-	self assert: presenter text text asString equals: plantUMLSource.
+	testedInstance imageURL accept: url.
+	testedInstance changeToTextButton performAction.
+	self assert: testedInstance text text asString equals: plantUMLSource.
 	
 ]
 
 { #category : #tests }
 PUGizmoSpec1Test >> testManageButtons [
-	self deny: presenter changeToImageButton isEnabled.
-	self deny: presenter changeToTextButton isEnabled.
-	presenter text text: plantUMLSource.
-	self assert: presenter changeToImageButton isEnabled.
-	presenter imageURL accept: url.
-	self assert: presenter changeToTextButton isEnabled
+	self deny: testedInstance changeToImageButton enabled.
+	self deny: testedInstance changeToTextButton enabled.
+	testedInstance text text: plantUMLSource.
+	self assert: testedInstance changeToImageButton enabled.
+	testedInstance imageURL accept: url.
+	self assert: testedInstance changeToTextButton enabled
 ]

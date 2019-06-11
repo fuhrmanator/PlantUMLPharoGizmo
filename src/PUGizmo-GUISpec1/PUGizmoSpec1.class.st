@@ -7,7 +7,8 @@ Class {
 		'imageURL',
 		'changeToImageButton',
 		'changeToTextButton',
-		'imageVerification'
+		'imageVerification',
+		'sourceList'
 	],
 	#category : #'PUGizmo-GUISpec1'
 }
@@ -17,6 +18,7 @@ PUGizmoSpec1 class >> defaultSpec [
 	^ SpecRowLayout composed
 		newColumn: [ :col | 
 			col
+			add: #sourceList height: self toolbarHeight;
 				add: #text;
 				add: #changeToImageButton height: self toolbarHeight ]
 			left: 0
@@ -69,7 +71,9 @@ PUGizmoSpec1 >> imageURL [
 
 { #category : #initialization }
 PUGizmoSpec1 >> initializePresenter [
-	text whenTextChangedDo: [ self manageButtons ].
+	sourceList
+		whenSelectedItemChanged: [ :item | self selectSample: item ].
+	text whenTextChanged: [ self manageButtons ].
 	imageURL
 		acceptBlock: [ :urlText | self updateWidgets: (PUGizmo loadUML: urlText) ].
 	changeToImageButton
@@ -81,9 +85,13 @@ PUGizmoSpec1 >> initializePresenter [
 { #category : #initialization }
 PUGizmoSpec1 >> initializeWidgets [
 	imageVerification := false.
+	sourceList := self newDropList.
+	sourceList
+		items: {('---Select a sample---' -> nil)} , PUGizmo sourceSamples;
+		displayBlock: [ :item | item key ].
 	text := self newText autoAccept: true.
 	image := self newImage.
-	imageURL := self newTextInput placeholder: 'URL'.
+	imageURL := self newTextInput ghostText: 'URL'.
 	changeToImageButton := self newButton disable
 		label: 'Get the UML';
 		icon: (self iconNamed: #glamorousRight).
@@ -108,6 +116,24 @@ PUGizmoSpec1 >> manageButtons [
 		ifTrue: [ changeToTextButton enable ]
 ]
 
+{ #category : #update }
+PUGizmoSpec1 >> selectSample: anItem [
+	anItem value
+		ifNil: [ text text: ''.
+			imageURL accept: ''.
+			]
+		ifNotNil: [ self
+				updateWidgets:
+					(PUGizmo
+						loadUML: 'https://www.plantuml.com/plantuml/img/' , anItem value).
+			changeToTextButton performAction ]
+]
+
+{ #category : #accessing }
+PUGizmoSpec1 >> sourceList [
+^sourceList
+]
+
 { #category : #accessing }
 PUGizmoSpec1 >> text [ ^text
 ]
@@ -122,7 +148,9 @@ PUGizmoSpec1 >> updateWidgets: aCollection [
 	| helpMessage |
 	helpMessage := aCollection third.
 	imageURL text: aCollection first.
-	image image: aCollection second.
+	aCollection second
+		ifNil: [ image image: (self iconNamed: #'blank-10') ]
+		ifNotNil: [ image image: aCollection second ].
 	helpMessage = ''
 		ifTrue: [ image help ]
 		ifFalse: [ image help: helpMessage ].
