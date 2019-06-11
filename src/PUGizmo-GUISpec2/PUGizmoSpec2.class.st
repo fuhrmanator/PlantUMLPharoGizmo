@@ -7,18 +7,20 @@ Class {
 		'imageURL',
 		'changeToImageButton',
 		'changeToTextButton',
-		'imageVerification'
+		'imageVerification',
+		'sourceList'
 	],
 	#category : #'PUGizmo-GUISpec2'
 }
 
 { #category : #specs }
 PUGizmoSpec2 class >> defaultSpec [
-	^ SpecPanedLayout
-		newHorizontal
+	^ SpecPanedLayout newHorizontal
 		position: 30 percent;
-			add:
+		add:
 			(SpecBoxLayout newVertical
+				add: #sourceList
+					withConstraints: [ :constraints | constraints height: self toolbarHeight ];
 				add: #text;
 				add: #changeToImageButton
 					withConstraints: [ :constraints | constraints height: self toolbarHeight ]);
@@ -57,22 +59,23 @@ PUGizmoSpec2 >> imageURL [
 
 { #category : #initialization }
 PUGizmoSpec2 >> initializePresenter [
+	sourceList whenSelectedItemChangedDo: [ :item | self selectSample:item ].
 	text whenTextChangedDo: [ self manageButtons ].
 	imageURL
-		acceptBlock: [ :urlText | 
-			self updateWidgets:(PUGizmo loadUML: urlText) ].
+		acceptBlock: [ :urlText | self updateWidgets: (PUGizmo loadUML: urlText) ].
 	changeToImageButton
-		action: [ 
-				self updateWidgets:(PUGizmo changeToImage: text text asString).
-			 ].
+		action: [ self updateWidgets: (PUGizmo changeToImage: text text asString) ].
 	changeToTextButton
 		action: [ text text: (PUGizmo changeToText: imageURL text) ]
 ]
 
 { #category : #initialization }
 PUGizmoSpec2 >> initializeWidgets [
-
 	imageVerification := false.
+	sourceList := self newDropList.
+	sourceList
+		items: {'---Select a sample---'->nil},PUGizmo sourceSamples;
+		displayBlock: [ :item | item key ].
 	text := self newText autoAccept: true.
 	image := self newImage.
 	imageURL := self newTextInput placeholder: 'URL'.
@@ -107,6 +110,19 @@ PUGizmoSpec2 >> manageButtons [
 imageVerification
 		ifFalse: [ changeToTextButton disable ];
 		ifTrue: [ changeToTextButton enable ]
+]
+
+{ #category : #update }
+PUGizmoSpec2 >> selectSample: anItem [
+	anItem value
+		ifNil: [ text text: ''.
+			imageURL accept: '' ]
+		ifNotNil:[.
+	self
+		updateWidgets:
+			(PUGizmo
+				loadUML: 'https://www.plantuml.com/plantuml/img/' , anItem value).
+	changeToTextButton performAction].
 ]
 
 { #category : #accessing }
