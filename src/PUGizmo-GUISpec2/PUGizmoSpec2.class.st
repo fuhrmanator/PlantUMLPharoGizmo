@@ -77,7 +77,7 @@ PUGizmoSpec2 >> initializeWidgets [
 		items: {'---Select a sample---'->nil},PUGizmo sourceSamples;
 		displayBlock: [ :item | item key ].
 	text := self newText autoAccept: true.
-	image := self newImage.
+	image := self newImage switchAutoscale switchAutoscale .
 	imageURL := self newTextInput placeholder: 'URL'.
 	changeToImageButton := self newButton disable
 		label: 'Get the UML';
@@ -135,6 +135,7 @@ PUGizmoSpec2 >> updateWidgets: aCollection [
 	helpMessage := aCollection third.
 	imageURL text: aCollection first.
 	image image: aCollection second.
+	image autoScale: true.
 	helpMessage = ''
 		ifTrue: [ image help: nil ]
 		ifFalse: [ image help: helpMessage ].
