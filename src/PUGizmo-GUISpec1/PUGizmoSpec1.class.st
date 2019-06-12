@@ -8,7 +8,8 @@ Class {
 		'changeToImageButton',
 		'changeToTextButton',
 		'imageVerification',
-		'sourceList'
+		'sourceList',
+		'resizeCheckBox'
 	],
 	#category : #'PUGizmo-GUISpec1'
 }
@@ -18,15 +19,16 @@ PUGizmoSpec1 class >> defaultSpec [
 	^ SpecRowLayout composed
 		newColumn: [ :col | 
 			col
-			add: #sourceList height: self toolbarHeight;
+				add: #sourceList height: self toolbarHeight;
 				add: #text;
 				add: #changeToImageButton height: self toolbarHeight ]
 			left: 0
 			right: 0.7;
 		newColumn: [ :col | 
 			col
-				add: #imageURL height: self toolbarHeight;
+				add: #imageURL height: 40;
 				add: #image;
+				add: #resizeCheckBox height: self toolbarHeight;
 				add: #changeToTextButton height: self toolbarHeight ]
 			left: 0.3
 			right: 0;
@@ -56,7 +58,7 @@ PUGizmoSpec1 >> extent [
 	| fontWidth rowHeight |
 	fontWidth := StandardFonts defaultFont widthOfString: 'M'.
 	rowHeight := self class inputTextHeight.
-	^ 75 @ 15 * (fontWidth @ rowHeight).
+	^ 75 @ 20 * (fontWidth @ rowHeight)
 ]
 
 { #category : #accessing }
@@ -70,28 +72,37 @@ PUGizmoSpec1 >> imageURL [
 ]
 
 { #category : #initialization }
+PUGizmoSpec1 >> initialize [
+	super initialize.
+	imageVerification := false.
+	sourceList
+		items: {('---Select a sample---' -> nil)} , PUGizmo sourceSamples;
+		displayBlock: [ :item | item key ].
+	text text: 'Bob->Alice : hello'.
+	resizeCheckBox state: true .changeToImageButton performAction
+]
+
+{ #category : #initialization }
 PUGizmoSpec1 >> initializePresenter [
 	sourceList
 		whenSelectedItemChanged: [ :item | self selectSample: item ].
 	text whenTextChanged: [ self manageButtons ].
 	imageURL
 		acceptBlock: [ :urlText | self updateWidgets: (PUGizmo loadUML: urlText) ].
+	resizeCheckBox whenChangedDo: [ :state | image autoScale: state not ].
 	changeToImageButton
 		action: [ self updateWidgets: (PUGizmo changeToImage: text text asString) ].
 	changeToTextButton
-		action: [ text text: (PUGizmo changeToText: imageURL text) ]
+		action: [ text text: (PUGizmo changeToText: imageURL text) ].
 ]
 
 { #category : #initialization }
 PUGizmoSpec1 >> initializeWidgets [
-	imageVerification := false.
 	sourceList := self newDropList.
-	sourceList
-		items: {('---Select a sample---' -> nil)} , PUGizmo sourceSamples;
-		displayBlock: [ :item | item key ].
 	text := self newText autoAccept: true.
-	image := self newImage.
+	image := self newImage switchAutoscale.
 	imageURL := self newTextInput ghostText: 'URL'.
+	resizeCheckBox := self newCheckBox label: 'Original size'.
 	changeToImageButton := self newButton disable
 		label: 'Get the UML';
 		icon: (self iconNamed: #glamorousRight).
@@ -114,6 +125,11 @@ PUGizmoSpec1 >> manageButtons [
 	imageVerification
 		ifFalse: [ changeToTextButton disable ];
 		ifTrue: [ changeToTextButton enable ]
+]
+
+{ #category : #accessing }
+PUGizmoSpec1 >> resizeCheckBox [
+^resizeCheckBox
 ]
 
 { #category : #update }

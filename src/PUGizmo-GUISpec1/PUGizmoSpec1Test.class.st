@@ -50,3 +50,11 @@ PUGizmoSpec1Test >> testManageButtons [
 	testedInstance imageURL accept: url.
 	self assert: testedInstance changeToTextButton enabled
 ]
+
+{ #category : #tests }
+PUGizmoSpec1Test >> testResizeCheckBox [
+	testedInstance resizeCheckBox state: true.
+	self deny: testedInstance image autoScale .
+	testedInstance resizeCheckBox state: false.
+		self assert: testedInstance image autoScale.
+]
