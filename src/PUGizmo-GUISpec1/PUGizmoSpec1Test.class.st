@@ -43,11 +43,14 @@ PUGizmoSpec1Test >> testChangeToTextButton [
 
 { #category : #tests }
 PUGizmoSpec1Test >> testManageButtons [
+	testedInstance text text: ''.
+	testedInstance imageURL accept: ''.
 	self deny: testedInstance changeToImageButton enabled.
 	self deny: testedInstance changeToTextButton enabled.
+	
 	testedInstance text text: plantUMLSource.
-	self assert: testedInstance changeToImageButton enabled.
 	testedInstance imageURL accept: url.
+	self assert: testedInstance changeToImageButton enabled.
 	self assert: testedInstance changeToTextButton enabled
 ]
 
