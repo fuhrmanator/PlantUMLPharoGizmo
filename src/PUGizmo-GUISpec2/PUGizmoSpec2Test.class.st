@@ -43,10 +43,20 @@ PUGizmoSpec2Test >> testChangeToTextButton [
 
 { #category : #tests }
 PUGizmoSpec2Test >> testManageButtons [
+	presenter text text: ''.
+	presenter imageURL accept: ''.
 	self deny: presenter changeToImageButton isEnabled.
 	self deny: presenter changeToTextButton isEnabled.
 	presenter text text: plantUMLSource.
 	self assert: presenter changeToImageButton isEnabled.
 	presenter imageURL accept: url.
 	self assert: presenter changeToTextButton isEnabled
+]
+
+{ #category : #tests }
+PUGizmoSpec2Test >> testResizeCheckBox [
+	presenter resizeCheckBox state: true.
+	self deny: presenter image autoScale.
+	presenter resizeCheckBox state: false.
+	self assert: presenter image autoScale
 ]

@@ -56,8 +56,25 @@ PUGizmoSpec2 >> changeToTextButton [
 ]
 
 { #category : #accessing }
+PUGizmoSpec2 >> image [
+^image
+]
+
+{ #category : #accessing }
 PUGizmoSpec2 >> imageURL [
 	^ imageURL
+]
+
+{ #category : #initialization }
+PUGizmoSpec2 >> initialize [
+	super initialize.
+	imageVerification := false.
+	sourceList
+		items: {('---Select a sample---' -> nil)} , PUGizmo sourceSamples;
+		displayBlock: [ :item | item key ].
+			text text: 'Bob->Alice : hello'.
+	resizeCheckBox state: true.
+	changeToImageButton performAction
 ]
 
 { #category : #initialization }
@@ -76,17 +93,11 @@ PUGizmoSpec2 >> initializePresenter [
 
 { #category : #initialization }
 PUGizmoSpec2 >> initializeWidgets [
-	imageVerification := false.
 	sourceList := self newDropList.
-	sourceList
-		items: {('---Select a sample---' -> nil)} , PUGizmo sourceSamples;
-		displayBlock: [ :item | item key ].
 	text := self newText autoAccept: true.
-	image := self newImage switchAutoscale switchAutoscale.
+	image := self newImage.
 	imageURL := self newTextInput placeholder: 'URL'.
-	resizeCheckBox := self newCheckBox
-		label:
-			'Original size'.
+	resizeCheckBox := self newCheckBox label: 'Original size'.
 	changeToImageButton := self newButton disable
 		label: 'Get the UML';
 		icon: (self iconNamed: #glamorousRight).
@@ -120,6 +131,11 @@ imageVerification
 		ifTrue: [ changeToTextButton enable ]
 ]
 
+{ #category : #accessing }
+PUGizmoSpec2 >> resizeCheckBox [
+^resizeCheckBox
+]
+
 { #category : #update }
 PUGizmoSpec2 >> selectSample: anItem [
 	anItem value
@@ -143,7 +159,6 @@ PUGizmoSpec2 >> updateWidgets: aCollection [
 	helpMessage := aCollection third.
 	imageURL text: aCollection first.
 	image image: aCollection second.
-	image autoScale: true.
 	helpMessage = ''
 		ifTrue: [ image help: nil ]
 		ifFalse: [ image help: helpMessage ].
