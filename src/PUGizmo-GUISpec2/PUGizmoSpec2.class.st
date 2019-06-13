@@ -117,7 +117,7 @@ PUGizmoSpec2 >> initializeWindow: aWindowPresenter [
 	| fontWidth rowHeight |
 	fontWidth := StandardFonts defaultFont widthOfString: 'M'.
 	rowHeight := self class inputTextHeight.
-	aWindowPresenter initialExtent: 75 @ 15 * (fontWidth @ rowHeight).
+	aWindowPresenter initialExtent: 75 @ 20 * (fontWidth @ rowHeight).
 	aWindowPresenter title: 'PUGizmo'
 ]
 
