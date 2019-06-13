@@ -105,13 +105,11 @@ PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes [
 						<< '"'.	"; << ' as entity'; << i asString"
 					extended := OrderedCollection new.
 					implemented := OrderedCollection new.
-					(c withSuperclassHierarchy reject: #isStub)
+					(c superclassHierarchy reject: #isStub)
 						do: [ :sc | 
 							sc isInterface
 								ifTrue: [ implemented add: sc ]
 								ifFalse: [ extended add: sc ] ].
-					"Moose includes the class itself in the hierarchy"
-					extended remove: c ifAbsent: [  ].
 					commaFlag := false.
 					extended isNotEmpty
 						ifTrue: [ stream << ' extends '.
@@ -121,8 +119,6 @@ PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes [
 										ifTrue: [ stream << ', ' ].
 									stream << e mooseName.
 									commaFlag := true ] ].
-					"Moose includes the class itself in the hierarchy"
-					implemented remove: c ifAbsent: [  ].
 					commaFlag := false.
 					implemented isNotEmpty
 						ifTrue: [ stream << ' implements '.
