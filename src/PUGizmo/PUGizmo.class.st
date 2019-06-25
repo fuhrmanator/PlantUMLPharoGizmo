@@ -17,6 +17,24 @@ PUGizmo class >> changeToText: aURL [
 	^aURL  plantUrlStringToPlantSourceString
 ]
 
+{ #category : #'as yet unclassified' }
+PUGizmo class >> constructorsForMooseClass: mClass [
+	"Find the constructors for a class"
+	^ mClass methods select: [ :m | m isConstructor]
+
+]
+
+{ #category : #'as yet unclassified' }
+PUGizmo class >> creatorsForMooseClass: mClass [
+	"Find the creators for a class"
+
+	^ ((self constructorsForMooseClass: mClass)
+		collect: [ :method | 
+			method incomingInvocations
+				collect: [ :ii | ii sender parentType ] ]) flattened.
+
+]
+
 { #category : #api }
 PUGizmo class >> loadUML: aServerUrlText [
 	| message image verification |
@@ -71,6 +89,7 @@ PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes [
 	w := imageMorph openInWindow.
 	w center; fitInWorld.	
 	"
+
 	^ String
 		new: 400
 		streamContents: [ :stream | 
@@ -129,6 +148,19 @@ PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes [
 									stream << imp mooseName.
 									commaFlag := true ] ].
 					stream cr ].
+			"Creates relations"
+			classes
+				do: [ :class | 
+					| creators |
+					creators := PUGizmo creatorsForMooseClass: class.
+					creators
+						do: [ :creator | 
+							stream << '"'; << creator mooseName; << '"'.
+							stream << ' ..> '.
+							stream << '"'; << class  mooseName; << '"'.
+							stream
+								<< ' : "<<creates>>" ';
+								cr ] ].
 			stream
 				<< '@enduml';
 				cr ]
