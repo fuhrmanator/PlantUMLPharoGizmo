@@ -28,11 +28,12 @@ PUGizmo class >> constructorsForMooseClass: mClass [
 PUGizmo class >> creatorsForMooseClass: mClass [
 	"Find the creators for a class"
 
-	^ ((self constructorsForMooseClass: mClass)
-		collect: [ :method | 
-			method incomingInvocations
-				collect: [ :ii | ii sender parentType ] ]) flattened.
-
+	| constructors creators |
+	constructors := self constructorsForMooseClass: mClass.
+	creators := constructors
+		collect:
+			[ :method | method incomingInvocations collect: [ :ii | ii sender parentType ] ].
+	^ creators flattened
 ]
 
 { #category : #api }
