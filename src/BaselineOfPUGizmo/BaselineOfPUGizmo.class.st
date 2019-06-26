@@ -7,7 +7,11 @@ Class {
 { #category : #baseline }
 BaselineOfPUGizmo >> baseline: spec [
 	<baseline>
-	spec for: #common do: [ spec package: 'PUGizmo' ].
+	spec
+		for: #common
+		do: [ spec
+				package: 'PUGizmo';
+				package: 'PUGizmo-Tests' with: [ spec requires: #('PUGizmo') ] ].
 	spec
 		for: #'pharo8.x'
 		do: [ spec
