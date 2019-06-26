@@ -1,6 +1,6 @@
 Class {
 	#name : #PUGizmoSpec2,
-	#superclass : #ComposablePresenter,
+	#superclass : #SpComposablePresenter,
 	#instVars : [
 		'text',
 		'image',
@@ -16,17 +16,17 @@ Class {
 
 { #category : #specs }
 PUGizmoSpec2 class >> defaultSpec [
-	^ SpecPanedLayout newHorizontal
+	^ SpPanedLayout newHorizontal
 		position: 30 percent;
 		add:
-			(SpecBoxLayout newVertical
+			(SpBoxLayout newVertical
 				add: #sourceList
 					withConstraints: [ :constraints | constraints height: self toolbarHeight ];
 				add: #text;
 				add: #changeToImageButton
 					withConstraints: [ :constraints | constraints height: self toolbarHeight ]);
 		add:
-			(SpecBoxLayout newVertical
+			(SpBoxLayout newVertical
 				add: #imageURL
 					withConstraints: [ :constraints | constraints height: self toolbarHeight ];
 				add: #image;
@@ -40,7 +40,7 @@ PUGizmoSpec2 class >> defaultSpec [
 { #category : #examples }
 PUGizmoSpec2 class >> open [
 	<example>
-	self new 
+	self new
 		openWithSpec
 ]
 
