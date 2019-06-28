@@ -66,6 +66,14 @@ PUGizmoSpec2 >> imageURL [
 ]
 
 { #category : #initialization }
+PUGizmoSpec2 >> initialExtent [
+	| fontWidth rowHeight |
+	fontWidth := StandardFonts defaultFont widthOfString: 'M'.
+	rowHeight := self class inputTextHeight.
+	^ 75 @ 20 * (fontWidth @ rowHeight)
+]
+
+{ #category : #initialization }
 PUGizmoSpec2 >> initialize [
 	super initialize.
 	imageVerification := false.
@@ -151,6 +159,11 @@ PUGizmoSpec2 >> selectSample: anItem [
 
 { #category : #accessing }
 PUGizmoSpec2 >> text [ ^text
+]
+
+{ #category : #api }
+PUGizmoSpec2 >> title [ 
+^'PUGizmo'
 ]
 
 { #category : #update }

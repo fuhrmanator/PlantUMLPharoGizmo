@@ -77,7 +77,7 @@ PUGizmo class >> open [
 ]
 
 { #category : #api }
-PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes [
+PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes withRelationships: aCollection [
 	"A utility method with Moose. e.g.:
 	| classes pUMLSource commaFlag |
 	classes := (MooseModel root first allClasses reject:#isStub) 
@@ -91,83 +91,130 @@ PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes [
 	w center; fitInWorld.	
 	"
 
+	"aCollection = {attributes . methods. inheritance . aggregation . create}"
+
 	^ String
 		new: 400
 		streamContents: [ :stream | 
-			| commaFlag |
-			stream
-				<< '@startuml';
-				cr.
-			"Automatic package generation using Moose names"
-			stream
-				<< 'set namespaceSeparator ::';
-				cr.
-			"Don't show UML attributes/methods if they're empty"
-			stream
-				<< 'hide empty members';
-				cr.
-			"Scale down the diagram"
-			stream
-				<< 'scale 1';
-				cr.
-			"Tends to generate a diagram that is longer rather than wider"
-			stream
-				<< 'left to right direction';
-				cr.
+			self startUMLWithStream: stream.
 			classes
-				doWithIndex: [ :c :i | 
-					| implemented extended |
-					c isInterface
-						ifTrue: [ stream << 'interface "' ]
-						ifFalse: [ stream << 'class "' ].
+				doWithIndex: [ :class :i | 
+					self printNameWithClass: class withStream: stream.
 					stream
-						<< c mooseName;
-						<< '"'.	"; << ' as entity'; << i asString"
-					extended := OrderedCollection new.
-					implemented := OrderedCollection new.
-					(c superclassHierarchy reject: #isStub)
-						do: [ :sc | 
-							sc isInterface
-								ifTrue: [ implemented add: sc ]
-								ifFalse: [ extended add: sc ] ].
-					commaFlag := false.
-					extended isNotEmpty
-						ifTrue: [ stream << ' extends '.
-							extended
-								do: [ :e | 
-									commaFlag
-										ifTrue: [ stream << ', ' ].
-									stream << e mooseName.
-									commaFlag := true ] ].
-					commaFlag := false.
-					implemented isNotEmpty
-						ifTrue: [ stream << ' implements '.
-							implemented
-								do: [ :imp | 
-									commaFlag
-										ifTrue: [ stream << ', ' ].
-									stream << imp mooseName.
-									commaFlag := true ] ].
-					stream cr ].
-			"Creates relations"
-			classes
-				do: [ :class | 
-					| creators |
-					creators := PUGizmo creatorsForMooseClass: class.
-					creators
-						do: [ :creator | 
-							stream << '"'; << creator mooseName; << '"'.
-							stream << ' ..> '.
-							stream << '"'; << class  mooseName; << '"'.
-							stream
-								<< ' : "<<creates>>" ';
-								cr ] ].
+						<< '{';
+						cr.
+					aCollection first
+						ifTrue: [ self printAttributesWithClass: class withStream: stream ].
+					aCollection second
+						ifTrue: [ self printMethodsWithClass: class withStream: stream ].
+					stream
+						<< '}';
+						cr ].
+
+			"inheritance relations"
+			aCollection third
+				ifTrue: [ classes
+						do: [ :class | self printInheritanceWithClass: class withStream: stream ] ].
+			aCollection fourth
+				ifTrue: [ classes
+						do: [ :class | self printAggregationWithClass: class withStream: stream ] ].
+
+			"creates relations"
+			aCollection fifth
+				ifTrue: [ classes
+						do: [ :class | self printCreateWithClass: class withStream: stream ] ].
+
+			"The end"
 			stream
 				<< '@enduml';
 				cr ]
 ]
 
-{ #category : #api }
+{ #category : #printing }
+PUGizmo class >> printAggregationWithClass: aClass withStream: aStream [
+	| aggregates |
+	aggregates := aClass attributes collect: #declaredType.
+	aggregates
+		do: [ :agg | 
+			aStream
+				<< '"';
+				<< agg mooseName;
+				<< '"'.
+			aStream << ' --o '.
+			aStream
+				<< '"';
+				<< aClass mooseName;
+				<< '"';
+				cr ]
+]
+
+{ #category : #printing }
+PUGizmo class >> printAttributesWithClass: aClass withStream: aStream [
+	aClass attributes do:[ :attribute|
+		
+		aStream << attribute name;cr
+		
+	
+		
+		]
+]
+
+{ #category : #printing }
+PUGizmo class >> printCreateWithClass: aClass withStream: aStream [
+	| creators |
+	creators := PUGizmo creatorsForMooseClass: aClass.
+	creators
+		do: [ :creator | 
+			aStream
+				<< '"';
+				<< creator mooseName;
+				<< '"'.
+			aStream << ' ..> '.
+			aStream
+				<< '"';
+				<< aClass mooseName;
+				<< '"'.
+			aStream
+				<< ' : "<<creates>>" ';
+				cr ].
+
+]
+
+{ #category : #printing }
+PUGizmo class >> printInheritanceWithClass: aClass withStream: aStream [
+						aClass superclassHierarchy
+						do: [ :superClass  | 
+							aStream
+								<< '"';
+								<< superClass mooseName;
+								<< '"'.
+							aStream << ' --|> '.
+							aStream
+								<< '"';
+								<< aClass mooseName;
+								<< '"';cr ] .
+]
+
+{ #category : #printing }
+PUGizmo class >> printMethodsWithClass: aClass withStream: aStream [
+	aClass methods
+		do: [ :method | 
+			aStream
+				<< method name;
+				<< '()' ;cr ]
+]
+
+{ #category : #printing }
+PUGizmo class >> printNameWithClass: aClass withStream: aStream [
+	aClass isInterface
+		ifTrue: [ aStream << 'interface "' ]
+		ifFalse: [ aStream << 'class "' ].
+	aStream
+		<< aClass mooseName;
+		<< '"';cr
+]
+
+{ #category : #source }
 PUGizmo class >> sourceSamples [
 	^ {('Basic Use cases'
 		->
@@ -220,4 +267,27 @@ PUGizmo class >> sourceSamples [
 	('Reactor sequence'
 		->
 			'LP1DQiGm38NtFeMOLGRQ760MtRI5zWw1e2WY8yPHWgrEcTjN-UaGRupzUE_fa_DDTCQ48sHxHFOp2TdF68Eh9YGpgi68eeLm8eonGxfT6dsVb18RD_fvPxL6lr3xoEa4c86wClUjOe8capRw8Nb6e-jkbRwmRYqv89dSqNY3y4dBtRtB4rxV_0eNKFujXSI3PEFKNZUOwX_u1NYXREqnypcurnFKUM9WsytLETHr3Uisi4gY0unJp-1wEMTBj6jdzk2JrWbxBjctOVjUdiqScQmgA8vzrP7qMUK_UYZsLmX_')}
+]
+
+{ #category : #printing }
+PUGizmo class >> startUMLWithStream: aStream [
+	aStream
+		<< '@startuml';
+		cr.
+	"Automatic package generation using Moose names"
+	aStream
+		<< 'set namespaceSeparator ::';
+		cr.
+	"Don't show UML attributes/methods if they're empty"
+	aStream
+		<< 'hide empty members';
+		cr.
+	"Scale down the diagram"
+	aStream
+		<< 'scale 1';
+		cr.
+	"Tends to generate a diagram that is longer rather than wider"
+	aStream
+		<< 'left to right direction';
+		cr.
 ]
