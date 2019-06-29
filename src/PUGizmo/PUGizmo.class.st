@@ -133,19 +133,20 @@ PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes withRelationships: a
 { #category : #printing }
 PUGizmo class >> printAggregationWithClass: aClass withStream: aStream [
 	| aggregates |
-	aggregates := (aClass attributes collect: #declaredType) reject: #isStub .
+	aggregates := (aClass attributes collect: #declaredType) reject: #isNil.
 	aggregates
-		do: [ :agg | 
-			aStream
-				<< '"';
-				<< agg mooseName;
-				<< '"'.
-			aStream << ' --o '.
-			aStream
-				<< '"';
-				<< aClass mooseName;
-				<< '"';
-				cr ]
+		ifNotEmpty: [ (aggregates reject: #isStub)
+				do: [ :agg | 
+					aStream
+						<< '"';
+						<< agg mooseName;
+						<< '"'.
+					aStream << ' --o '.
+					aStream
+						<< '"';
+						<< aClass mooseName;
+						<< '"';
+						cr ] ]
 ]
 
 { #category : #printing }
@@ -281,10 +282,10 @@ PUGizmo class >> startUMLWithStream: aStream [
 		<< 'set namespaceSeparator ::';
 		cr.
 	"Don't show UML attributes/methods if they're empty"
-	"	aStream
+	aStream
 		<< 'hide empty members';
 		cr.
-"	"Scale down the diagram"
+	"Scale down the diagram"
 	aStream
 		<< 'scale 1';
 		cr.
