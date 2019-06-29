@@ -133,7 +133,7 @@ PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes withRelationships: a
 { #category : #printing }
 PUGizmo class >> printAggregationWithClass: aClass withStream: aStream [
 	| aggregates |
-	aggregates := aClass attributes collect: #declaredType.
+	aggregates := (aClass attributes collect: #declaredType) reject: #isStub .
 	aggregates
 		do: [ :agg | 
 			aStream
@@ -150,13 +150,11 @@ PUGizmo class >> printAggregationWithClass: aClass withStream: aStream [
 
 { #category : #printing }
 PUGizmo class >> printAttributesWithClass: aClass withStream: aStream [
-	aClass attributes do:[ :attribute|
-		
-		aStream << attribute name;cr
-		
-	
-		
-		]
+	aClass attributes
+		do: [ :attribute | 
+			aStream
+				<< attribute name;
+				cr ]
 ]
 
 { #category : #printing }
@@ -176,23 +174,25 @@ PUGizmo class >> printCreateWithClass: aClass withStream: aStream [
 				<< '"'.
 			aStream
 				<< ' : "<<creates>>" ';
-				cr ].
-
+				cr ]
 ]
 
 { #category : #printing }
 PUGizmo class >> printInheritanceWithClass: aClass withStream: aStream [
-						aClass superclassHierarchy
-						do: [ :superClass  | 
-							aStream
-								<< '"';
-								<< superClass mooseName;
-								<< '"'.
-							aStream << ' --|> '.
-							aStream
-								<< '"';
-								<< aClass mooseName;
-								<< '"';cr ] .
+	(aClass superclassHierarchy reject: #isStub)
+		do: [ :superClass | 
+			aStream
+				<< '"';
+				<< superClass mooseName;
+				<< '"'.
+			superClass isInterface
+				ifTrue: [ aStream << ' <|.. ' ]
+				ifFalse: [ aStream << ' <|-- ' ].
+			aStream
+				<< '"';
+				<< aClass mooseName;
+				<< '"';
+				cr ]
 ]
 
 { #category : #printing }
@@ -201,7 +201,8 @@ PUGizmo class >> printMethodsWithClass: aClass withStream: aStream [
 		do: [ :method | 
 			aStream
 				<< method name;
-				<< '()' ;cr ]
+				<< '()';
+				cr ]
 ]
 
 { #category : #printing }
@@ -211,7 +212,8 @@ PUGizmo class >> printNameWithClass: aClass withStream: aStream [
 		ifFalse: [ aStream << 'class "' ].
 	aStream
 		<< aClass mooseName;
-		<< '"';cr
+		<< '"';
+		cr
 ]
 
 { #category : #source }
@@ -279,15 +281,15 @@ PUGizmo class >> startUMLWithStream: aStream [
 		<< 'set namespaceSeparator ::';
 		cr.
 	"Don't show UML attributes/methods if they're empty"
-	aStream
+	"	aStream
 		<< 'hide empty members';
 		cr.
-	"Scale down the diagram"
+"	"Scale down the diagram"
 	aStream
 		<< 'scale 1';
 		cr.
 	"Tends to generate a diagram that is longer rather than wider"
 	aStream
 		<< 'left to right direction';
-		cr.
+		cr
 ]

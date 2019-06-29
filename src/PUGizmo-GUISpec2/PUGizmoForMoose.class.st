@@ -153,12 +153,12 @@ PUGizmoForMoose >> initializeWindow: aWindowPresenter [
 	fontWidth := StandardFonts defaultFont widthOfString: 'M'.
 	rowHeight := self class inputTextHeight.
 	aWindowPresenter initialExtent: 100 @ 20 * (fontWidth @ rowHeight).
-	aWindowPresenter title: 'Moose PUGizmo'
+	aWindowPresenter title: 'Moose PlantUML Gizmo'
 ]
 
 { #category : #api }
 PUGizmoForMoose >> title [ 
-'Moose PUGizmo'.
+'Moose PlantUML Gizmo'.
 ]
 
 { #category : #action }
