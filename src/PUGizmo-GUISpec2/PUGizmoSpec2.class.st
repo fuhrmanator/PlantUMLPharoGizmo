@@ -37,7 +37,7 @@ PUGizmoSpec2 class >> defaultSpec [
 		yourself
 ]
 
-{ #category : #examples }
+{ #category : #example }
 PUGizmoSpec2 class >> open [
 	<example>
 	self new
@@ -126,7 +126,7 @@ PUGizmoSpec2 >> initializeWindow: aWindowPresenter [
 	fontWidth := StandardFonts defaultFont widthOfString: 'M'.
 	rowHeight := self class inputTextHeight.
 	aWindowPresenter initialExtent: 75 @ 20 * (fontWidth @ rowHeight).
-	aWindowPresenter title: 'PUGizmo'
+	aWindowPresenter title: self title
 ]
 
 { #category : #'button state' }

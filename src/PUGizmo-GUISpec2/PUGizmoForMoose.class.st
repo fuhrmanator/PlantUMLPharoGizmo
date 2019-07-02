@@ -6,13 +6,19 @@ Class {
 		'classList',
 		'filter',
 		'getTheDiagramButton',
+		'preferenceButton',
 		'diagram',
 		'resizeCheckBox',
 		'attributeCheckBox',
 		'methodCheckBox',
 		'inheritanceCheckBox',
 		'aggregationCheckBox',
-		'createCheckBox'
+		'createCheckBox',
+		'preferencePresenter',
+		'preference',
+		'pUMLSource',
+		'copySourceButton',
+		'items'
 	],
 	#category : #'PUGizmo-GUISpec2'
 }
@@ -53,7 +59,11 @@ PUGizmoForMoose class >> defaultSpec [
 						add: #createCheckBox)
 					withConstraints: [ :constraints | constraints height: self toolbarHeight ];
 				add: #diagram;
-				add: #resizeCheckBox
+				add:
+					(SpBoxLayout newHorizontal
+						add: #resizeCheckBox;
+						add: #preferenceButton;
+						add: #copySourceButton)
 					withConstraints: [ :constraints | constraints height: self toolbarHeight ]);
 		yourself
 ]
@@ -69,23 +79,31 @@ PUGizmoForMoose >> buildBlockFrom: aString [
 	^self class compiler evaluate: '[ :each | ' , aString , ']'
 ]
 
-{ #category : #action }
-PUGizmoForMoose >> getTheDiagram [
-	| pUMLSource serverUrl |
-	pUMLSource := PUGizmo
-		plantUMLSourceForMooseJavaClasses: classList items
-		withRelationships:
-			{attributeCheckBox state.
-			methodCheckBox state.
-			inheritanceCheckBox state.
-			aggregationCheckBox state.
-			createCheckBox  state}.
+{ #category : #menu }
+PUGizmoForMoose >> classListMenu [
+	^ self newMenu
+		addGroup: [ :aGroup | 
+			aGroup
+				addItem: [ :anItem | 
+					anItem
+						name: 'Select';
+						action: [ self selectClasses ] ] ]
+]
 
-	"using a local server"
-	serverUrl := 'http://localhost:8080/plantuml/img/'
-		, pUMLSource asPlantUMLKey.
-	"serverUrl := 'https://www.plantuml.com/plantuml/img/', key ."
-	diagram image: (ZnEasy getPng: serverUrl asUrl)
+{ #category : #action }
+PUGizmoForMoose >> copyUMLCode [
+	Clipboard clipboardText: pUMLSource.
+	self inform: 'Copy'
+]
+
+{ #category : #api }
+PUGizmoForMoose >> enableCheckBoxes [
+	resizeCheckBox enable.
+	attributeCheckBox enable.
+	methodCheckBox enable.
+	inheritanceCheckBox enable.
+	aggregationCheckBox enable.
+	createCheckBox enable
 ]
 
 { #category : #initialization }
@@ -97,17 +115,27 @@ PUGizmoForMoose >> initialExtent [
 ]
 
 { #category : #initialization }
+PUGizmoForMoose >> initialize [
+pUMLSource := ''.
+	preference := ''.
+	preferencePresenter := PreferencePresenter new.
+	super initialize
+]
+
+{ #category : #initialization }
 PUGizmoForMoose >> initializePresenter [
 	modelList whenSelectionChangedDo: [ self updateClasses ].
 	filter whenTextIsAcceptedDo: [ self updateClasses ].
-	getTheDiagramButton action: [ self getTheDiagram ].
+	getTheDiagramButton action: [ self setDiagram ].
+	preferenceButton action: [ self managePreferenceDialog ].
+	copySourceButton action: [ self copyUMLCode ].
 	resizeCheckBox
 		whenChangedDo: [ :state | diagram autoScale: state not ].
-	attributeCheckBox whenChangedDo: [ self getTheDiagram ].
-	methodCheckBox whenChangedDo: [ self getTheDiagram ].
-	inheritanceCheckBox whenChangedDo: [ self getTheDiagram ].
-	aggregationCheckBox whenChangedDo: [ self getTheDiagram ].
-	createCheckBox whenChangedDo: [ self getTheDiagram ].
+	attributeCheckBox whenChangedDo: [ self updateDiagram  ].
+	methodCheckBox whenChangedDo: [ self updateDiagram ].
+	inheritanceCheckBox whenChangedDo: [ self updateDiagram  ].
+	aggregationCheckBox whenChangedDo: [ self updateDiagram  ].
+	createCheckBox whenChangedDo: [ self updateDiagram  ]
 ]
 
 { #category : #initialization }
@@ -118,33 +146,31 @@ PUGizmoForMoose >> initializeWidgets [
 		displayBlock: [ :item | item name ];
 		icons: [ :item | item mooseIcon ];
 		sortingBlock: [ :a :b | a name < b name ].
-	classList := self newList.
-	classList icons: [ :item | item mooseIcon ].
+	classList := self newList
+		beMultipleSelection;
+		contextMenu: self classListMenu.
+	classList
+		icons: [ :item | item mooseIcon ];
+		sortingBlock: [ :a :b | a name < b name ].
 	filter := self newTextInput placeholder: 'each isStub'.
 	getTheDiagramButton := self newButton disable
-		label: 'Get the Class diagram';
+		label: 'Get the diagram';
 		icon: (self iconNamed: #glamorousGo).
+	preferenceButton := self newButton disable label: 'Preference'.
+	copySourceButton := self newButton disable label: 'Copy current UML code'.
 	diagram := self newImage.
-	resizeCheckBox := self newCheckBox
+	resizeCheckBox := self newCheckBox disable
 		label: 'Original size';
 		state: true.
-	attributeCheckBox := self newCheckBox label: 'Attributes'.
-	methodCheckBox := self newCheckBox label: 'Methods'.
-	inheritanceCheckBox := self newCheckBox label: 'Inheritance'.
-	aggregationCheckBox := self newCheckBox label: 'Aggregation'.
-	createCheckBox := self newCheckBox label: 'Create'.
+	attributeCheckBox := self newCheckBox disable label: 'Attributes'.
+	methodCheckBox := self newCheckBox disable label: 'Methods'.
+	inheritanceCheckBox := self newCheckBox disable label: 'Inheritance'.
+	aggregationCheckBox := self newCheckBox disable label: 'Aggregation'.
+	createCheckBox := self newCheckBox disable label: 'Create'.
 	self focusOrder
 		add: modelList;
 		add: classList;
-		add: filter;
-		add: getTheDiagramButton;
-		add: diagram;
-		add: resizeCheckBox;
-		add: attributeCheckBox;
-		add: methodCheckBox;
-		add: inheritanceCheckBox;
-		add: aggregationCheckBox;
-		add: createCheckBox
+		add: filter
 ]
 
 { #category : #initialization }
@@ -153,12 +179,43 @@ PUGizmoForMoose >> initializeWindow: aWindowPresenter [
 	fontWidth := StandardFonts defaultFont widthOfString: 'M'.
 	rowHeight := self class inputTextHeight.
 	aWindowPresenter initialExtent: 100 @ 20 * (fontWidth @ rowHeight).
-	aWindowPresenter title: 'Moose PlantUML Gizmo'
+	aWindowPresenter title: self title
+]
+
+{ #category : #action }
+PUGizmoForMoose >> managePreferenceDialog [
+	preferencePresenter preference: preference.
+	preferencePresenter openDialogWithSpec
+		okAction: [ preference := preferencePresenter preference asString.
+			self updateDiagram.
+			preferencePresenter window close ]
+]
+
+{ #category : #menu }
+PUGizmoForMoose >> selectClasses [
+	classList items: classList selection selectedItems.
+	classList unselectAll.
+	getTheDiagramButton enable
+]
+
+{ #category : #action }
+PUGizmoForMoose >> setDiagram [
+	items := classList items.
+	attributeCheckBox enable.
+	methodCheckBox enable.
+	inheritanceCheckBox enable.
+	aggregationCheckBox enable.
+	createCheckBox enable.
+	resizeCheckBox enable.
+	preferenceButton enable.
+	copySourceButton enable.
+	self updateDiagram.
+	getTheDiagramButton disable
 ]
 
 { #category : #api }
-PUGizmoForMoose >> title [ 
-'Moose PlantUML Gizmo'.
+PUGizmoForMoose >> title [
+	^'Moose PlantUML Gizmo'
 ]
 
 { #category : #action }
@@ -174,6 +231,27 @@ PUGizmoForMoose >> updateClasses [
 				do: [ filteredItem := {} ] ].
 	classList items: filteredItem.
 	filteredItem
-		ifEmpty: [ getTheDiagramButton disable ]
+		ifEmpty: [  getTheDiagramButton disable]
 		ifNotEmpty: [ getTheDiagramButton enable ]
+]
+
+{ #category : #action }
+PUGizmoForMoose >> updateDiagram [
+
+	| serverUrl |
+	pUMLSource := PUGizmo
+		plantUMLSourceForMooseJavaClasses: items
+		withPreference: preference
+		withRelationships:
+			{attributeCheckBox state.
+			methodCheckBox state.
+			inheritanceCheckBox state.
+			aggregationCheckBox state.
+			createCheckBox state}.
+
+	"using a local server"
+	serverUrl := 'http://localhost:8080/plantuml/img/'
+		, pUMLSource asPlantUMLKey.
+	"serverUrl := 'https://www.plantuml.com/plantuml/img/', key ."
+	diagram image: (ZnEasy getPng: serverUrl asUrl)
 ]

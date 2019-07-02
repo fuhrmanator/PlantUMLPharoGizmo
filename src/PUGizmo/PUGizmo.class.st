@@ -77,7 +77,7 @@ PUGizmo class >> open [
 ]
 
 { #category : #api }
-PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes withRelationships: aCollection [
+PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes withPreference: preference withRelationships: aCollection [
 	"A utility method with Moose. e.g.:
 	| classes pUMLSource commaFlag |
 	classes := (MooseModel root first allClasses reject:#isStub) 
@@ -97,10 +97,14 @@ PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes withRelationships: a
 		new: 400
 		streamContents: [ :stream | 
 			self startUMLWithStream: stream.
+			preference
+				ifNotEmpty: [ stream
+						<< preference;
+						cr ].
 			classes
 				doWithIndex: [ :class :i | 
 					self printNameWithClass: class withStream: stream.
-					stream
+					(aCollection first or:[aCollection second]) ifTrue:[stream
 						<< '{';
 						cr.
 					aCollection first
@@ -109,7 +113,7 @@ PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes withRelationships: a
 						ifTrue: [ self printMethodsWithClass: class withStream: stream ].
 					stream
 						<< '}';
-						cr ].
+						cr ]].
 
 			"inheritance relations"
 			aCollection third
