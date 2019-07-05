@@ -280,21 +280,6 @@ PUGizmo class >> sourceSamples [
 PUGizmo class >> startUMLWithStream: aStream [
 	aStream
 		<< '@startuml';
-		cr.
-	"Automatic package generation using Moose names"
-	aStream
-		<< 'set namespaceSeparator ::';
-		cr.
-	"Don't show UML attributes/methods if they're empty"
-	aStream
-		<< 'hide empty members';
-		cr.
-	"Scale down the diagram"
-	aStream
-		<< 'scale 1';
-		cr.
-	"Tends to generate a diagram that is longer rather than wider"
-	aStream
-		<< 'left to right direction';
 		cr
+
 ]

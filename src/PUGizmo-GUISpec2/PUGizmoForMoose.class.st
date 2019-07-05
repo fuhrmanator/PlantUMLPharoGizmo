@@ -120,8 +120,10 @@ PUGizmoForMoose >> initialExtent [
 
 { #category : #initialization }
 PUGizmoForMoose >> initialize [
-pUMLSource := ''.
-	preference := ''.
+	pUMLSource := ''.
+	preference := 'set namespaceSeparator ::' , String cr
+		, 'hide empty members' , String cr , 'scale 1' , String cr
+		, 'left to right direction' , String cr.
 	preferencePresenter := PreferencePresenter new.
 	super initialize
 ]
