@@ -79,6 +79,13 @@ PUGizmoForMoose >> buildBlockFrom: aString [
 	^self class compiler evaluate: '[ :each | ' , aString , ']'
 ]
 
+{ #category : #accessing }
+PUGizmoForMoose >> classList [
+	"For the test"
+
+	^ classList
+]
+
 { #category : #menu }
 PUGizmoForMoose >> classListMenu [
 	^ self newMenu
@@ -96,14 +103,11 @@ PUGizmoForMoose >> copyUMLCode [
 	self inform: 'Copy'
 ]
 
-{ #category : #api }
-PUGizmoForMoose >> enableCheckBoxes [
-	resizeCheckBox enable.
-	attributeCheckBox enable.
-	methodCheckBox enable.
-	inheritanceCheckBox enable.
-	aggregationCheckBox enable.
-	createCheckBox enable
+{ #category : #accessing }
+PUGizmoForMoose >> filter [
+	"For the test"
+
+	^ filter
 ]
 
 { #category : #initialization }
@@ -189,6 +193,12 @@ PUGizmoForMoose >> managePreferenceDialog [
 		okAction: [ preference := preferencePresenter preference asString.
 			self updateDiagram.
 			preferencePresenter window close ]
+]
+
+{ #category : #accessing }
+PUGizmoForMoose >> modelList [
+	"For the test"
+	^ modelList
 ]
 
 { #category : #menu }

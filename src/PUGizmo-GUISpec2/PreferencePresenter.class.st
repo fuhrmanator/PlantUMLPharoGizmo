@@ -33,6 +33,10 @@ PreferencePresenter >> initializeWidgets [
 
 { #category : #initialization }
 PreferencePresenter >> initializeWindow: aWindowPresenter [
+	| fontWidth rowHeight |
+	fontWidth := StandardFonts defaultFont widthOfString: 'M'.
+	rowHeight := self class inputTextHeight.
+	aWindowPresenter initialExtent: 42 @ 8 * (fontWidth @ rowHeight).
 	aWindowPresenter title: self title
 ]
 
