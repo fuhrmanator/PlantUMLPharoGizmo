@@ -1,6 +1,6 @@
 Class {
 	#name : #PreferencePresenter,
-	#superclass : #SpComposablePresenter,
+	#superclass : #SpPresenter,
 	#instVars : [
 		'inputText'
 	],

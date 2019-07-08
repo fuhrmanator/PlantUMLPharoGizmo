@@ -1,6 +1,6 @@
 Class {
 	#name : #PUGizmoSpec2,
-	#superclass : #SpComposablePresenter,
+	#superclass : #SpPresenter,
 	#instVars : [
 		'text',
 		'image',

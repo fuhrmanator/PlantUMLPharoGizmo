@@ -1,6 +1,6 @@
 Class {
 	#name : #PUGizmoForMoose,
-	#superclass : #SpComposablePresenter,
+	#superclass : #SpPresenter,
 	#instVars : [
 		'modelList',
 		'classList',
