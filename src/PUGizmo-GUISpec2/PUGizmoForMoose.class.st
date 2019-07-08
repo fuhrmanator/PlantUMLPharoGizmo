@@ -3,7 +3,8 @@ Class {
 	#superclass : #SpPresenter,
 	#instVars : [
 		'modelList',
-		'classList',
+		'classTable',
+		'selectionTable',
 		'filter',
 		'getTheDiagramButton',
 		'preferenceButton',
@@ -18,7 +19,8 @@ Class {
 		'preference',
 		'pUMLSource',
 		'copySourceButton',
-		'items'
+		'items',
+		'selectedClasses'
 	],
 	#category : #'PUGizmo-GUISpec2'
 }
@@ -28,26 +30,32 @@ PUGizmoForMoose class >> defaultSpec [
 	^ SpPanedLayout newHorizontal
 		position: 60 percent;
 		add:
-			(SpBoxLayout newVertical
-				add:
-					(SpPanedLayout newHorizontal
-						position: 30 percent;
-						add: #modelList;
-						add: #classList);
+			(SpPanedLayout newHorizontal
+				position: 70 percent;
 				add:
 					(SpBoxLayout newVertical
-						add: ' ';
+						add:
+							(SpPanedLayout newHorizontal
+								position: 30 percent;
+								add: #modelList;
+								add: #classTable);
+						add: ''
+							withConstraints: [ :constraints | constraints height: 0 ];
 						add:
 							(SpBoxLayout newHorizontal
 								add: 'Filter: [ :each | '
 									withConstraints: [ :constraints | constraints width: 80 ];
 								add: #filter;
 								add: ' ]'
-									withConstraints: [ :constraints | constraints width: 15 ]);
-						add: ' ';
+									withConstraints: [ :constraints | constraints width: 15 ])
+							withConstraints: [ :constraints | constraints height: self toolbarHeight ]);
+				add:
+					(SpBoxLayout newVertical
+						add: #selectionTable;
+						add: ''
+							withConstraints: [ :constraints | constraints height: 0 ];
 						add: #getTheDiagramButton
-							withConstraints: [ :constraints | constraints height: self toolbarHeight ])
-					withConstraints: [ :constraints | constraints height: 3 * self toolbarHeight ]);
+							withConstraints: [ :constraints | constraints height: self toolbarHeight ]));
 		add:
 			(SpBoxLayout newVertical
 				add:
@@ -76,14 +84,10 @@ PUGizmoForMoose class >> open [
 
 { #category : #action }
 PUGizmoForMoose >> buildBlockFrom: aString [
-	^self class compiler evaluate: '[ :each | ' , aString , ']'
-]
+[ ^self class compiler evaluate: '[ :each | ' , aString , ']' ]
+		on: SyntaxErrorNotification
+		do: [ ^ [  ] ].
 
-{ #category : #accessing }
-PUGizmoForMoose >> classList [
-	"For the test"
-
-	^ classList
 ]
 
 { #category : #menu }
@@ -95,6 +99,13 @@ PUGizmoForMoose >> classListMenu [
 					anItem
 						name: 'Select';
 						action: [ self selectClasses ] ] ]
+]
+
+{ #category : #accessing }
+PUGizmoForMoose >> classTable [
+	"For the test"
+
+	^ classTable
 ]
 
 { #category : #action }
@@ -121,6 +132,7 @@ PUGizmoForMoose >> initialExtent [
 { #category : #initialization }
 PUGizmoForMoose >> initialize [
 	pUMLSource := ''.
+	selectedClasses := OrderedCollection new.
 	preference := 'set namespaceSeparator ::' , String cr
 		, 'hide empty members' , String cr , 'scale 1' , String cr
 		, 'left to right direction' , String cr.
@@ -130,32 +142,69 @@ PUGizmoForMoose >> initialize [
 
 { #category : #initialization }
 PUGizmoForMoose >> initializePresenter [
-	modelList whenSelectionChangedDo: [ self updateClasses ].
+	modelList whenSelectionChangedDo: [ 	selectedClasses removeAll.self updateClasses ].
 	filter whenTextIsAcceptedDo: [ self updateClasses ].
 	getTheDiagramButton action: [ self setDiagram ].
 	preferenceButton action: [ self managePreferenceDialog ].
 	copySourceButton action: [ self copyUMLCode ].
 	resizeCheckBox
 		whenChangedDo: [ :state | diagram autoScale: state not ].
-	attributeCheckBox whenChangedDo: [ self updateDiagram  ].
+	attributeCheckBox whenChangedDo: [ self updateDiagram ].
 	methodCheckBox whenChangedDo: [ self updateDiagram ].
-	inheritanceCheckBox whenChangedDo: [ self updateDiagram  ].
-	aggregationCheckBox whenChangedDo: [ self updateDiagram  ].
-	createCheckBox whenChangedDo: [ self updateDiagram  ]
+	inheritanceCheckBox whenChangedDo: [ self updateDiagram ].
+	aggregationCheckBox whenChangedDo: [ self updateDiagram ].
+	createCheckBox whenChangedDo: [ self updateDiagram ]
+]
+
+{ #category : #initialization }
+PUGizmoForMoose >> initializeTables [
+	classTable := self newTable
+		beMultipleSelection;
+		contextMenu: self classListMenu;
+		sortingBlock: [ :a :b | a fullPrintString < b fullPrintString ].
+	classTable
+		addColumn:
+			((SpCheckBoxTableColumn
+				evaluated: [ :class | selectedClasses includes: class ])
+				onActivation: [ :class | 
+					selectedClasses add: class.
+					self updateSelections ];
+				onDesactivation: [ :class | 
+					selectedClasses remove: class.
+					self updateSelections ];
+				width: 20;
+				yourself);
+		addColumn:
+			((SpImageTableColumn evaluated: #mooseIcon)
+				width: 20;
+				yourself);
+		addColumn: (SpStringTableColumn evaluated: #fullPrintString).
+	selectionTable := self newTable
+		beMultipleSelection;
+		contextMenu: self selectionListMenu.
+	selectionTable
+		addColumn:
+			((SpCheckBoxTableColumn
+				evaluated: [ :class | selectedClasses includes: class ])
+				onDesactivation: [ :class | 
+					selectedClasses remove: class.
+					self updateSelections ];
+				width: 20;
+				yourself);
+		addColumn:
+			((SpImageTableColumn evaluated: #mooseIcon)
+				width: 20;
+				yourself);
+		addColumn: (SpStringTableColumn evaluated: #name)
 ]
 
 { #category : #initialization }
 PUGizmoForMoose >> initializeWidgets [
+	self initializeTables.
 	modelList := self newList.
 	modelList
 		items: MooseModel root allModels;
 		displayBlock: [ :item | item name ];
-		icons: [ :item | item mooseIcon ];
-		sortingBlock: [ :a :b | a name < b name ].
-	classList := self newList
-		beMultipleSelection;
-		contextMenu: self classListMenu.
-	classList
 		icons: [ :item | item mooseIcon ];
 		sortingBlock: [ :a :b | a name < b name ].
 	filter := self newTextInput placeholder: 'each isStub'.
@@ -163,7 +212,8 @@ PUGizmoForMoose >> initializeWidgets [
 		label: 'Get the diagram';
 		icon: (self iconNamed: #glamorousGo).
 	preferenceButton := self newButton disable label: 'Preference'.
-	copySourceButton := self newButton disable label: 'Copy current UML code'.
+	copySourceButton := self newButton disable
+		label: 'Copy current UML code'.
 	diagram := self newImage.
 	resizeCheckBox := self newCheckBox disable
 		label: 'Original size';
@@ -175,7 +225,8 @@ PUGizmoForMoose >> initializeWidgets [
 	createCheckBox := self newCheckBox disable label: 'Create'.
 	self focusOrder
 		add: modelList;
-		add: classList;
+		add: classTable;
+		add: selectionTable;
 		add: filter
 ]
 
@@ -184,7 +235,7 @@ PUGizmoForMoose >> initializeWindow: aWindowPresenter [
 	| fontWidth rowHeight |
 	fontWidth := StandardFonts defaultFont widthOfString: 'M'.
 	rowHeight := self class inputTextHeight.
-	aWindowPresenter initialExtent: 100 @ 20 * (fontWidth @ rowHeight).
+	aWindowPresenter initialExtent: 110 @ 20 * (fontWidth @ rowHeight).
 	aWindowPresenter title: self title
 ]
 
@@ -203,16 +254,26 @@ PUGizmoForMoose >> modelList [
 	^ modelList
 ]
 
-{ #category : #menu }
+{ #category : #action }
 PUGizmoForMoose >> selectClasses [
-	classList items: classList selection selectedItems.
-	classList unselectAll.
-	getTheDiagramButton enable
+	selectedClasses addAllFirstUnlessAlreadyPresent: classTable selection selectedItems.
+	self updateSelections.
+]
+
+{ #category : #menu }
+PUGizmoForMoose >> selectionListMenu [
+	^ self newMenu
+		addGroup: [ :aGroup | 
+			aGroup
+				addItem: [ :anItem | 
+					anItem
+						name: 'Unselect';
+						action: [ self unselectClasses ] ] ]
 ]
 
 { #category : #action }
 PUGizmoForMoose >> setDiagram [
-	items := classList items.
+	items := selectedClasses..
 	attributeCheckBox enable.
 	methodCheckBox enable.
 	inheritanceCheckBox enable.
@@ -231,6 +292,12 @@ PUGizmoForMoose >> title [
 ]
 
 { #category : #action }
+PUGizmoForMoose >> unselectClasses [
+	selectionTable selection selectedItems
+		do: [ :each | selectedClasses remove: each ] .self updateSelections
+]
+
+{ #category : #action }
 PUGizmoForMoose >> updateClasses [
 	| filterText filterBlock filteredItem |
 	filterText := filter text.
@@ -240,11 +307,13 @@ PUGizmoForMoose >> updateClasses [
 			[ filteredItem := modelList selection selectedItem allClasses
 				select: filterBlock ]
 				on: Error
-				do: [ filteredItem := {} ] ].
-	classList items: filteredItem.
+				do: [
+					filteredItem := {} ] ].
+	classTable items: filteredItem.
 	filteredItem
-		ifEmpty: [  getTheDiagramButton disable]
-		ifNotEmpty: [ getTheDiagramButton enable ]
+		ifEmpty: [ getTheDiagramButton disable ]
+		ifNotEmpty: [ getTheDiagramButton enable ].
+	self updateSelections
 ]
 
 { #category : #action }
@@ -266,4 +335,12 @@ PUGizmoForMoose >> updateDiagram [
 		, pUMLSource asPlantUMLKey.
 	"serverUrl := 'https://www.plantuml.com/plantuml/img/', key ."
 	diagram image: (ZnEasy getPng: serverUrl asUrl)
+]
+
+{ #category : #action }
+PUGizmoForMoose >> updateSelections [
+	selectionTable items: selectedClasses.
+	classTable items: classTable items.
+	
+	selectedClasses ifEmpty: [ getTheDiagramButton disable]ifNotEmpty:[ getTheDiagramButton enable]
 ]

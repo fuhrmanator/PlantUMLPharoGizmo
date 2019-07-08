@@ -3879,28 +3879,28 @@ PUGizmoForMooseTest >> simpleModel [
 { #category : #tests }
 PUGizmoForMooseTest >> testFilterClasses [
 	| items |
-	items := presenter classList items
+	items := presenter classTable items
 		select: [ :each | each name beginsWith: 'P' ].
 	presenter filter
 		text: 'each name beginsWith:''P''';
 		accept.
-	self assert: presenter classList items size equals: items size.
-	presenter classList items
+	self assert: presenter classTable items size equals: items size.
+	presenter classTable items
 		do: [ :each | self assert: (each name beginsWith: 'P') ]
 ]
 
 { #category : #tests }
 PUGizmoForMooseTest >> testUpdateClassListWhenmodelListIsChanged [
 	| classes |
-	classes := presenter classList items.
+	classes := presenter classTable items.
 	presenter modelList selectIndex: 2.
-	self deny: presenter classList items size equals: classes size.
+	self deny: presenter classTable items size equals: classes size.
 	self
-		deny: presenter classList items first name
+		deny: presenter classTable items first name
 		equals: classes first name.
 	presenter modelList selectIndex: 1.
-		self assert: presenter classList items size equals: classes size.
+		self assert: presenter classTable items size equals: classes size.
 	self
-		assert: presenter classList items first name
+		assert: presenter classTable items first name
 		equals: classes first name.
 ]
