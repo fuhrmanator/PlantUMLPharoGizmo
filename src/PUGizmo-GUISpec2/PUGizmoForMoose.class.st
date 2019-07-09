@@ -66,7 +66,7 @@ PUGizmoForMoose class >> defaultSpec [
 						add: #aggregationCheckBox;
 						add: #createCheckBox)
 					withConstraints: [ :constraints | constraints height: self toolbarHeight ];
-				add: #diagram;
+				add: (SpScrollableLayout with: #diagram); "Might work in the future"
 				add:
 					(SpBoxLayout newHorizontal
 						add: #resizeCheckBox;
