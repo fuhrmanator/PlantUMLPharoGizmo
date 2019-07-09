@@ -3890,7 +3890,46 @@ PUGizmoForMooseTest >> testFilterClasses [
 ]
 
 { #category : #tests }
-PUGizmoForMooseTest >> testUpdateClassListWhenmodelListIsChanged [
+PUGizmoForMooseTest >> testSelectClasses [
+	presenter classTable selectIndexes: {1 . 3}.
+	self
+		assert:
+			presenter selectionTable items
+				isEmpty .
+	presenter selectClasses.
+	self
+		assert:
+			(presenter selectionTable items
+				includes: presenter classTable items first).
+	self
+		deny:
+			(presenter selectionTable items
+				includes: presenter classTable items second).
+	self
+		assert:
+			(presenter selectionTable items
+				includes: presenter classTable items third)
+]
+
+{ #category : #tests }
+PUGizmoForMooseTest >> testUnselectClasses [
+	presenter classTable selectIndex: 1.
+	presenter selectClasses.
+	self assert: presenter selectionTable items isNotEmpty.
+	self
+		assert:
+			(presenter selectionTable items
+				includes: presenter classTable items first).
+					presenter selectionTable selectIndex: 1.
+	presenter unselectClasses.
+	self
+		deny:
+			(presenter selectionTable items
+				includes: presenter classTable items first).
+]
+
+{ #category : #tests }
+PUGizmoForMooseTest >> testUpdateClassListWhenModelListIsChanged [
 	| classes |
 	classes := presenter classTable items.
 	presenter modelList selectIndex: 2.
@@ -3899,8 +3938,8 @@ PUGizmoForMooseTest >> testUpdateClassListWhenmodelListIsChanged [
 		deny: presenter classTable items first name
 		equals: classes first name.
 	presenter modelList selectIndex: 1.
-		self assert: presenter classTable items size equals: classes size.
+	self assert: presenter classTable items size equals: classes size.
 	self
 		assert: presenter classTable items first name
-		equals: classes first name.
+		equals: classes first name
 ]
