@@ -271,6 +271,13 @@ PUGizmoForMoose >> selectionListMenu [
 						action: [ self unselectClasses ] ] ]
 ]
 
+{ #category : #accessing }
+PUGizmoForMoose >> selectionTable [
+	"For the test"
+
+	^ selectionTable
+]
+
 { #category : #action }
 PUGizmoForMoose >> setDiagram [
 	items := selectedClasses..
