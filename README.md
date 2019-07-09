@@ -35,7 +35,7 @@ Here's the SVG of the diagram shown in the screenshot above, rendered from the P
 There's a utility method to generate PlantUML source for a Java model in Moose. 
 
 ```Smalltalk
-| classes pUMLSource commaFlag |
+| classes pUMLSource |
 classes := (MooseModel root first allClasses reject:#isStub) 
   select: [:c | c mooseName beginsWith: 'headfirst::designpatterns::factory::pizzaaf'].
 pUMLSource := PUGizmo plantUMLSourceForMooseJavaClasses: classes.
