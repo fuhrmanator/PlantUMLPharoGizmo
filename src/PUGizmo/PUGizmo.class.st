@@ -184,7 +184,7 @@ PUGizmo class >> printCreateWithClass: aClass withStream: aStream [
 
 { #category : #printing }
 PUGizmo class >> printInheritanceWithClass: aClass withStream: aStream [
-	(aClass superclassHierarchy reject: #isStub)
+	(aClass directSuperclasses reject: #isStub)
 		do: [ :superClass | 
 			aStream
 				<< '"';
