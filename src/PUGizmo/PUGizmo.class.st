@@ -212,9 +212,7 @@ PUGizmo class >> printMethodsWithClass: aClass withStream: aStream [
 
 { #category : #printing }
 PUGizmo class >> printNameWithClass: aClass withStream: aStream [
-	aClass isInterface
-		ifTrue: [ aStream << 'interface "' ]
-		ifFalse: [ aStream << 'class "' ].
+	aClass printOnGizmo: aStream.
 	aStream
 		<< aClass mooseName;
 		<< '"';
