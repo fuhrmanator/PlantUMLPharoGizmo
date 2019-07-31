@@ -79,6 +79,7 @@ PUGizmoForMoose class >> defaultSpec [
 { #category : #examples }
 PUGizmoForMoose class >> open [
 	<example>
+	<mooseTool: #'PlantUML Gizmo'>
 	self new openWithSpec
 ]
 
