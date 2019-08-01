@@ -339,7 +339,8 @@ PUGizmoForMoose >> updateDiagram [
 			createCheckBox state}.
 
 	"using a local server"
-	serverUrl := 'http://localhost:8080/plantuml/img/'
+	"serverUrl := 'http://localhost:8080/plantuml/img/'"
+	serverUrl := 'https://www.plantuml.com/plantuml/png/'
 		, pUMLSource asPlantUMLKey.
 	"serverUrl := 'https://www.plantuml.com/plantuml/img/', key ."
 	diagram image: (ZnEasy getPng: serverUrl asUrl)
