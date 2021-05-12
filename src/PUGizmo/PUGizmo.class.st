@@ -17,6 +17,12 @@ PUGizmo class >> changeToText: aURL [
 	^aURL  plantUrlStringToPlantSourceString
 ]
 
+{ #category : #checking }
+PUGizmo class >> checkSmalltalkTypeContainerOf: aFamixStClass [
+	"Check if the type container is capable to understand isInterface"
+	^ aFamixStClass typeContainer mooseName = #Smalltalk
+]
+
 { #category : #'as yet unclassified' }
 PUGizmo class >> constructorsForMooseClass: mClass [
 	"Find the constructors for a class"
@@ -190,7 +196,7 @@ PUGizmo class >> printInheritanceWithClass: aClass withStream: aStream [
 				<< '"';
 				<< superClass mooseName;
 				<< '"'.
-			superClass isInterface
+			((self checkSmalltalkTypeContainerOf: superClass) not and: [superClass isInterface])
 				ifTrue: [ aStream << ' <|.. ' ]
 				ifFalse: [ aStream << ' <|-- ' ].
 			aStream
