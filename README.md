@@ -49,13 +49,13 @@ w center; fitInWorld.
 ### Simple class diagram
 
 ```smalltalk
-plantUMLSource := ('@startuml' , String cr ,
-'skinparam style strictuml' , String cr ,
-'skinparam backgroundcolor transparent' , String cr ,
-'skinparam classbackgroundcolor Yellow/LightYellow' , String cr ,
-'class Banana' , String cr ,
-'note right #red: Ceci n''est pas\nune banane. ' , String cr ,
-'@enduml').
+plantUMLSource := '@startuml
+skinparam style strictuml
+skinparam backgroundcolor transparent
+skinparam classbackgroundcolor Yellow/LightYellow
+class Banana
+note right #red: Ceci n''est pas\nune banane. 
+@enduml'.
 
 codePart := plantUMLSource plantDeflateAndEncode.
 
@@ -73,7 +73,20 @@ self assert: recoveredSource equals: plantUMLSource.
 ### Mind map
 
 ```smalltalk
-plantUMLSource := Character cr join: #('@startmindmap' '* Debian' '** Ubuntu' '*** Linux Mint' '*** Kubuntu' '*** Lubuntu' '*** KDE Neon' '** LMDE' '** SolydXK' '** SteamOS' '** Raspbian with a very long name' '*** <s>Raspmbc</s> => OSMC' '*** <s>Raspyfi</s> => Volumio' '@endmindmap').
+plantUMLSource := '@startmindmap
+* Debian
+** Ubuntu
+*** Linux Mint
+*** Kubuntu
+*** Lubuntu
+*** KDE Neon
+** LMDE
+** SolydXK
+** SteamOS
+** Raspbian with a very long name
+*** <s>Raspmbc</s> => OSMC
+*** <s>Raspyfi</s> => Volumio
+@endmindmap'.
 
 codePart := plantUMLSource plantDeflateAndEncode.
 
