@@ -5,10 +5,76 @@ Class {
 	#name : #PUGizmoTest,
 	#superclass : #TestCase,
 	#instVars : [
-		'mooseModel'
+		'mooseJavaModel',
+		'mooseSTModel'
 	],
 	#category : #'PUGizmo-Tests'
 }
+
+{ #category : #'as yet unclassified' }
+PUGizmoTest class >> mseDummySmalltalkHardCodedStream [
+	^ ReadStream on: '(
+	(Famix-PharoSmalltalk-Entities.Package (id: 1)
+		(name ''Kernel'')
+		(isStub true)
+		(numberOfLinesOfCode -1))
+	(Famix-PharoSmalltalk-Entities.PharoEntitySourceAnchor (id: 2)
+		(element (ref: 3)))
+	(Famix-PharoSmalltalk-Entities.Inheritance (id: 4)
+		(isStub false)
+		(numberOfLinesOfCode -1)
+		(subclass (ref: 3))
+		(superclass (ref: 5)))
+	(Famix-PharoSmalltalk-Entities.Namespace (id: 6)
+		(name ''Smalltalk'')
+		(isStub false)
+		(numberOfLinesOfCode 6095))
+	(Famix-PharoSmalltalk-Entities.PharoEntitySourceAnchor (id: 7)
+		(element (ref: 8)))
+	(Famix-PharoSmalltalk-Entities.Class (id: 3)
+		(name ''DummyA'')
+		(isStub false)
+		(numberOfLinesOfCode 5)
+		(parentPackage (ref: 9))
+		(typeContainer (ref: 6)))
+	(Famix-PharoSmalltalk-Entities.PharoEntitySourceAnchor (id: 10)
+		(element (ref: 11)))
+	(Famix-PharoSmalltalk-Entities.Inheritance (id: 12)
+		(isStub false)
+		(numberOfLinesOfCode -1)
+		(subclass (ref: 5))
+		(superclass (ref: 8)))
+	(Famix-PharoSmalltalk-Entities.Class (id: 11)
+		(name ''DummyB'')
+		(isStub false)
+		(numberOfLinesOfCode 5)
+		(parentPackage (ref: 9))
+		(typeContainer (ref: 6)))
+	(Famix-PharoSmalltalk-Entities.Package (id: 9)
+		(name ''Dummy-ForSTMSE'')
+		(isStub false)
+		(numberOfLinesOfCode 10))
+	(Famix-PharoSmalltalk-Entities.Class (id: 5)
+		(name ''Object'')
+		(isStub true)
+		(numberOfLinesOfCode 5409)
+		(parentPackage (ref: 1))
+		(typeContainer (ref: 6)))
+	(Famix-PharoSmalltalk-Entities.SourceLanguage (id: 13))
+	(Famix-PharoSmalltalk-Entities.Inheritance (id: 14)
+		(isStub false)
+		(numberOfLinesOfCode -1)
+		(subclass (ref: 11))
+		(superclass (ref: 3)))
+	(Famix-PharoSmalltalk-Entities.Class (id: 8)
+		(name ''ProtoObject'')
+		(isStub true)
+		(numberOfLinesOfCode 676)
+		(parentPackage (ref: 1))
+		(typeContainer (ref: 6)))
+	(Famix-PharoSmalltalk-Entities.PharoEntitySourceAnchor (id: 15)
+		(element (ref: 5))))'
+]
 
 { #category : #'as yet unclassified' }
 PUGizmoTest class >> mseFileFactoryVariantsHardCodedStream [
@@ -12509,7 +12575,7 @@ PUGizmoTest class >> mseFileFactoryVariantsHardCodedStream [
 PUGizmoTest >> classFromMooseName: aString [ 
 	"get the FAMIXclass that corresponds to the Moose Name"
 	| matches |
-	matches := mooseModel allClasses
+	matches := mooseJavaModel allClasses
 		select: [ :c | c mooseName = aString ].
 	self assert: matches size equals: 1.
 	^matches first
@@ -12519,23 +12585,46 @@ PUGizmoTest >> classFromMooseName: aString [
 PUGizmoTest >> methodFromMooseName: aString [ 
 	"get the FAMIXmethod that corresponds to the Moose Name"
 	| matches |
-	matches := mooseModel allMethods
+	matches := mooseJavaModel allMethods
 		select: [ :method | method mooseName = aString ].
 	self assert: matches size equals: 1.
 	^matches first
+]
+
+{ #category : #accessing }
+PUGizmoTest >> mooseJavaModel [
+	^ mooseJavaModel
+]
+
+{ #category : #accessing }
+PUGizmoTest >> mooseJavaModel: anObject [
+	^ mooseJavaModel := anObject
+]
+
+{ #category : #accessing }
+PUGizmoTest >> mooseSTModel [
+	^ mooseSTModel
+]
+
+{ #category : #accessing }
+PUGizmoTest >> mooseSTModel: anObject [
+	mooseSTModel := anObject
 ]
 
 { #category : #running }
 PUGizmoTest >> setUp [
 	"Hooks that subclasses may override to define the fixture of test."
 	super setUp.
-	mooseModel
-		ifNil: [ mooseModel := MooseModel
-				importFromMSEStream: PUGizmoTest mseFileFactoryVariantsHardCodedStream ]
+	mooseJavaModel
+		ifNil: [ self mooseJavaModel: (MooseModel
+				importFromMSEStream: PUGizmoTest mseFileFactoryVariantsHardCodedStream) ].
+			
+	mooseSTModel 
+		ifNil: [ self mooseSTModel: (FamixStModel importFromMSEStream: PUGizmoTest mseDummySmalltalkHardCodedStream) ]
 ]
 
 { #category : #tests }
-PUGizmoTest >> testConstructorsForMooseClass [
+PUGizmoTest >> testConstructorsForJavaClass [
 	"comment stating purpose of instance-side message"
 	"scope: class-variables  &  instance-variables"
 
@@ -12565,7 +12654,7 @@ PUGizmoTest >> testConstructorsForMooseClass [
 ]
 
 { #category : #tests }
-PUGizmoTest >> testCreatorsForMooseClass [
+PUGizmoTest >> testCreatorsForJavaClass [
 	"comment stating purpose of instance-side message"
 
 	"scope: class-variables  &  instance-variables"
@@ -12583,4 +12672,17 @@ PUGizmoTest >> testCreatorsForMooseClass [
 				with:
 					(self
 						classFromMooseName: 'headfirst::designpatterns::factory::pizzafm::NYPizzaStore')) asSet.
+]
+
+{ #category : #tests }
+PUGizmoTest >> testPrintInheritanceWithClassWithStream [
+	| stream class |
+	stream := String new writeStream.
+	class := mooseSTModel allClasses detect: [ :c | c name = 'DummyB' ].
+	PUGizmo printInheritanceWithClass: class withStream: stream.
+	self
+		assert: stream contents
+		equals:
+			'"Smalltalk::DummyA" <|-- "Smalltalk::DummyB"
+'.
 ]

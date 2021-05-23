@@ -76,8 +76,16 @@ PUGizmo class >> open [
 	SystemVersion current major > 7 ifTrue: [ PUGizmoSpec2 open ] ifFalse: [ PUGizmoSpec1 open ]
 ]
 
+{ #category : #'as yet unclassified' }
+PUGizmo class >> plantUMLSourceForMooseClasses: classes [
+	^ self
+		plantUMLSourceForMooseClasses: classes
+		withPreference: ''
+		withRelationships: {true . true . true . true . true}
+]
+
 { #category : #api }
-PUGizmo class >> plantUMLSourceForMooseJavaClasses: classes withPreference: preference withRelationships: aCollection [
+PUGizmo class >> plantUMLSourceForMooseClasses: classes withPreference: preference withRelationships: aCollection [
 	"A utility method with Moose. e.g.:
 	| classes pUMLSource commaFlag |
 	classes := (MooseModel root first allClasses reject:#isStub) 
@@ -190,9 +198,11 @@ PUGizmo class >> printInheritanceWithClass: aClass withStream: aStream [
 				<< '"';
 				<< superClass mooseName;
 				<< '"'.
-			superClass isInterface
+			((superClass class selectors includes: #isInterface)
+				and: [ superClass isInterface ])
 				ifTrue: [ aStream << ' <|.. ' ]
 				ifFalse: [ aStream << ' <|-- ' ].
+			"superClass isInterface"
 			aStream
 				<< '"';
 				<< aClass mooseName;
