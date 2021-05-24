@@ -28,16 +28,16 @@ Here's the SVG of the diagram shown in the screenshot above, rendered from the P
 
 #### Programmatic usage
 
-There's a utility method to generate PlantUML source for a Java model in Moose. 
+There's a utility method to generate PlantUML source for a Java model (see [this example](https://fuhrmanator.github.io/2019/07/29/AnalyzingJavaWithMoose.html)) in Moose. 
 
 ```Smalltalk
-| classes pUMLSource |
+| classes pUMLSource key serverUrl imageMorph w |
 classes := (MooseModel root first allClasses reject:#isStub) 
   select: [:c | c mooseName beginsWith: 'headfirst::designpatterns::factory::pizzaaf'].
-pUMLSource := PUGizmo plantUMLSourceForMooseJavaClasses: classes.
-key := pUMLSource asPlantUMLKey.
-"using a local server"
-serverUrl := 'http://localhost:8080/plantuml/img/', key .
+pUMLSource := PUGizmo plantUMLSourceForMooseClasses: classes.
+
+key := pUMLSource plantDeflateAndEncode.
+serverUrl := 'http://www.plantuml.com/plantuml/png/', key .
 imageMorph := (ZnEasy getPng: serverUrl asUrl) asAlphaImageMorph .
 imageMorph layout: #scaledAspect.
 w := imageMorph openInWindow.
