@@ -205,7 +205,7 @@ PUGizmoForMoose >> initializeWidgets [
 	modelList := self newList.
 	modelList
 		items: MooseModel root allModels;
-		displayBlock: [ :item | item name ];
+		display: [ :item | item name ];
 		icons: [ :item | item mooseIcon ];
 		sortingBlock: [ :a :b | a name < b name ].
 	filter := self newTextInput placeholder: 'each isStub'.
@@ -329,7 +329,7 @@ PUGizmoForMoose >> updateDiagram [
 
 	| serverUrl |
 	pUMLSource := PUGizmo
-		plantUMLSourceForMooseJavaClasses: items
+		plantUMLSourceForMooseClasses: items
 		withPreference: preference
 		withRelationships:
 			{attributeCheckBox state.
