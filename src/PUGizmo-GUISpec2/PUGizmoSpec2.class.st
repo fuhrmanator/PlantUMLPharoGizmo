@@ -79,8 +79,8 @@ PUGizmoSpec2 >> initialize [
 	imageVerification := false.
 	sourceList
 		items: {('---Select a sample---' -> nil)} , PUGizmo sourceSamples;
-		displayBlock: [ :item | item key ].
-			text text: 'Bob->Alice : hello'.
+		display: [ :item | item key ].
+	text text: 'Bob->Alice : hello'.
 	resizeCheckBox state: true.
 	changeToImageButton performAction
 ]
