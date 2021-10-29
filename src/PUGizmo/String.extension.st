@@ -155,7 +155,7 @@ String >> asPlantUMLSource [
 	decoded := self _decode64.
 	inflated := decoded pkunzipped.
 	escaped := inflated _escape.
-	^ escaped _decodeURIComponent convertFromSystemString
+	^ (ZnUTF8Encoder new decodeBytes: (escaped _decodeURIComponent) asByteArray ) "convertFromSystemString"
 ]
 
 { #category : #'*PUGizmo' }
@@ -209,7 +209,7 @@ String >> plantDeflateAndEncode [
 	"Ported from https://github.com/dougn/python-plantuml/blob/master/plantuml.py"
 
 	| zlibbedStr compressedString |
-	zlibbedStr := self convertToSystemString pkzipped.
+	zlibbedStr := self asUTF8Bytes asString pkzipped.
 "	'zlibbed:' crLog.
 	(zlibbedStr asHex copyWithRegex: '16r' matchesReplacedWith: '') crLog."
 	"Remove the compression type and CRC (to save space?)"

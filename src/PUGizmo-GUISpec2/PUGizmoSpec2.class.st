@@ -16,25 +16,29 @@ Class {
 
 { #category : #specs }
 PUGizmoSpec2 class >> defaultSpec [
+
 	^ SpPanedLayout newHorizontal
-		position: 30 percent;
-		add:
-			(SpBoxLayout newVertical
-				add: #sourceList
-					withConstraints: [ :constraints | constraints height: self toolbarHeight ];
-				add: #text;
-				add: #changeToImageButton
-					withConstraints: [ :constraints | constraints height: self toolbarHeight ]);
-		add:
-			(SpBoxLayout newVertical
-				add: #imageURL
-					withConstraints: [ :constraints | constraints height: self toolbarHeight ];
-				add: #image;
-				add: #resizeCheckBox
-					withConstraints: [ :constraints | constraints height: self toolbarHeight ];
-				add: #changeToTextButton
-					withConstraints: [ :constraints | constraints height: self toolbarHeight ]);
-		yourself
+		  positionOfSlider: 30 percent;
+		  add: (SpBoxLayout newVertical
+				   add: #sourceList
+				   withConstraints: [ :constraints | 
+					   constraints height: self toolbarHeight ];
+				   add: #text;
+				   add: #changeToImageButton
+				   withConstraints: [ :constraints | 
+					   constraints height: self toolbarHeight ]);
+		  add: (SpBoxLayout newVertical
+				   add: #imageURL
+				   withConstraints: [ :constraints | 
+					   constraints height: self toolbarHeight ];
+				   add: #image;
+				   add: #resizeCheckBox
+				   withConstraints: [ :constraints | 
+					   constraints height: self toolbarHeight ];
+				   add: #changeToTextButton
+				   withConstraints: [ :constraints | 
+					   constraints height: self toolbarHeight ]);
+		  yourself
 ]
 
 { #category : #example }
@@ -91,7 +95,7 @@ PUGizmoSpec2 >> initializePresenter [
 		whenSelectedItemChangedDo: [ :item | self selectSample: item ].
 	text whenTextChangedDo: [ self manageButtons ].
 	imageURL
-		acceptBlock: [ :urlText | self updateWidgets: (PUGizmo loadUML: urlText) ].
+		whenEntryCompletionChangedDo: [ :urlText | self updateWidgets: (PUGizmo loadUML: urlText) ].
 	resizeCheckBox whenChangedDo: [ :state | image autoScale: state not ].
 	changeToImageButton
 		action: [ self updateWidgets: (PUGizmo changeToImage: text text asString) ].
@@ -148,7 +152,7 @@ PUGizmoSpec2 >> resizeCheckBox [
 PUGizmoSpec2 >> selectSample: anItem [
 	anItem value
 		ifNil: [ text text: ''.
-			imageURL accept: '' ]
+			imageURL text: '' ]
 		ifNotNil:[.
 	self
 		updateWidgets:

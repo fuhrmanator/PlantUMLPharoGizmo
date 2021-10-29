@@ -40,7 +40,9 @@ StringTest >> testPkzippedPkunzipped [
 { #category : #'*PUGizmo' }
 StringTest >> testPlantDeflateAndEncode [
 
-	self assert: 'A->B:Âllo?' plantDeflateAndEncode equals: 'SzIrSx8wt9IJasyF0000'.
+	self
+		assert: 'A->B:Allô?' plantDeflateAndEncode
+		equals: 'SzIrSx9opCavlCKU0000'
 ]
 
 { #category : #'*PUGizmo' }
@@ -85,17 +87,23 @@ StringTest >> testPlantTextPlantUMLLocalhostRandom [
 
 { #category : #'*PUGizmo' }
 StringTest >> testPlantTextSimpleSource [
-	| source encodedUTF8 zlibString compressedString |
 
+	| source encodedUTF8 zlibString compressedString |
 	source := 'a->b'.
 	self assert: source asPlantUMLKey equals: 'IzIrIm80'.
-	encodedUTF8 := source convertToSystemString.
-	self assert: encodedUTF8 asHexNoRadical2 asLowercase  asSpacedForDiffString equals: '612d3e62' asSpacedForDiffString.	
-	zlibString := encodedUTF8  pkzipped.
-	self assert: zlibString asHexNoRadical2 asLowercase asSpacedForDiffString equals: '789c4bd4b54b020002ed012f' asSpacedForDiffString.
-	compressedString := zlibString copyFrom: 3 to: zlibString size -4.
-	self assert: compressedString asHexNoRadical2 asLowercase asSpacedForDiffString equals: '4bd4b54b0200' asSpacedForDiffString.
-
+	encodedUTF8 := source asUTF8Bytes asString.
+	self
+		assert: encodedUTF8 asHexNoRadical2 asLowercase
+		equals: '612d3e62'.
+	zlibString := encodedUTF8 pkzipped.
+"first 2 bytes are system dependent?"
+	self
+		assert: zlibString asHexNoRadical2 asLowercase
+		equals: '785e4bd4b54b020002ed012f' "'789c4bd4b54b020002ed012f'" .
+	compressedString := zlibString copyFrom: 3 to: zlibString size - 4.
+	self
+		assert: compressedString asHexNoRadical2 asLowercase
+		equals: '4bd4b54b0200'
 ]
 
 { #category : #'*PUGizmo' }
@@ -112,7 +120,11 @@ StringTest >> testPlantTextVaryingSizesOfRandomText [
 { #category : #'*PUGizmo' }
 StringTest >> testPlantUrlStringToPlantSourceString [
 
-	self assert: 'https://www.plantuml.com/plantuml/img/SzIrSx8wt9IJasyF0000' plantUrlStringToPlantSourceString  equals: 'A->B:Âllo?'.
+	self
+		assert:
+			'https://www.plantuml.com/plantuml/img/SzIrSx9opCavlCKU0000'
+				plantUrlStringToPlantSourceString
+		equals: 'A->B:Allô?'
 ]
 
 { #category : #'*PUGizmo' }
