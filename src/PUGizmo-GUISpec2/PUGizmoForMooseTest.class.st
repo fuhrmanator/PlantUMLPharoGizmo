@@ -5,7 +5,8 @@ Class {
 	#name : #PUGizmoForMooseTest,
 	#superclass : #SpecTestCase,
 	#instVars : [
-		'models'
+		'models',
+		'presenter'
 	],
 	#category : #'PUGizmo-GUISpec2'
 }
@@ -3841,9 +3842,10 @@ PUGizmoForMooseTest >> mooseModels [
 { #category : #setup }
 PUGizmoForMooseTest >> setUp [
 	super setUp.
+	presenter := PUGizmoForMoose new.
 	self mooseModels.
-	self presenter modelList items: models.
-	self presenter modelList selectIndex: 1.
+	presenter modelList items: models.
+	presenter modelList selectIndex: 1.
 ]
 
 { #category : #models }

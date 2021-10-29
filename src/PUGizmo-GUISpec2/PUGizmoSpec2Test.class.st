@@ -3,7 +3,8 @@ Class {
 	#superclass : #SpecTestCase,
 	#instVars : [
 		'plantUMLSource',
-		'url'
+		'url',
+		'presenter'
 	],
 	#category : #'PUGizmo-GUISpec2'
 }
@@ -16,6 +17,7 @@ PUGizmoSpec2Test >> classToTest [
 { #category : #setup }
 PUGizmoSpec2Test >> setUp [
 	super setUp.
+	presenter := self classToTest new.
 	plantUMLSource := '@startuml' , String cr
 		, 'skinparam style strictuml' , String cr
 		, 'skinparam backgroundcolor transparent' , String cr
