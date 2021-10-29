@@ -3,13 +3,26 @@ Pharo support for PlantUML.
 
 > Note: The GUI part of this project was initially done in Spec 2, which works best in Pharo 8. However, the baseline will load a GUI that works with Pharo 7. 
 
+> Note 2: Many people have requested support for PlantUML **without Moose**, so I made a fork. I only tested it in Pharo 9 (PRs are welcome to make it work in Pharo 8):
+
+> Note 3: Have a look at https://github.com/kasperosterbye/PlantUMLBridge for a simpler version of the support in this tool.
+
 [![Demo video of prototype](http://img.youtube.com/vi/fHCcYSa6VhU/0.jpg?1)](https://www.youtube.com/watch?v=fHCcYSa6VhU "Demo of PlantUML Gizmo prototype in Pharo with Spec GUI")
 
-## Loading
+## Loading (requires Moose)
 
 ```Smalltalk
 Metacello new
   repository: 'github://fuhrmanator/PlantUMLPharoGizmo/src';
+  baseline: 'PUGizmo';
+  load.
+```
+
+## Loading (without Moose, requires Pharo 9)
+
+```Smalltalk
+Metacello new
+  repository: 'github://fuhrmanator/PlantUMLPharoGizmo:pharo9/src';
   baseline: 'PUGizmo';
   load.
 ```
