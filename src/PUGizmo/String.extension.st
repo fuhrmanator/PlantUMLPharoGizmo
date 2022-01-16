@@ -209,7 +209,7 @@ String >> plantDeflateAndEncode [
 	"Ported from https://github.com/dougn/python-plantuml/blob/master/plantuml.py"
 
 	| zlibbedStr compressedString |
-	zlibbedStr := self convertToSystemString pkzipped.
+	zlibbedStr := self "convertToSystemString" pkzipped.
 "	'zlibbed:' crLog.
 	(zlibbedStr asHex copyWithRegex: '16r' matchesReplacedWith: '') crLog."
 	"Remove the compression type and CRC (to save space?)"
