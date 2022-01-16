@@ -27,53 +27,50 @@ Class {
 
 { #category : #specs }
 PUGizmoForMoose class >> defaultSpec [
+
 	^ SpPanedLayout newHorizontal
-		position: 60 percent;
-		add:
-			(SpPanedLayout newHorizontal
-				position: 70 percent;
-				add:
-					(SpBoxLayout newVertical
-						add:
-							(SpPanedLayout newHorizontal
-								position: 30 percent;
-								add: #modelList;
-								add: #classTable);
-						add: ''
-							withConstraints: [ :constraints | constraints height: 0 ];
-						add:
-							(SpBoxLayout newHorizontal
-								add: 'Filter: [ :each | '
-									withConstraints: [ :constraints | constraints width: 80 ];
-								add: #filter;
-								add: ' ]'
-									withConstraints: [ :constraints | constraints width: 15 ])
-							withConstraints: [ :constraints | constraints height: self toolbarHeight ]);
-				add:
-					(SpBoxLayout newVertical
-						add: #selectionTable;
-						add: ''
-							withConstraints: [ :constraints | constraints height: 0 ];
-						add: #getTheDiagramButton
-							withConstraints: [ :constraints | constraints height: self toolbarHeight ]));
-		add:
-			(SpBoxLayout newVertical
-				add:
-					(SpBoxLayout newHorizontal
-						add: #attributeCheckBox;
-						add: #methodCheckBox;
-						add: #inheritanceCheckBox;
-						add: #aggregationCheckBox;
-						add: #createCheckBox)
-					withConstraints: [ :constraints | constraints height: self toolbarHeight ];
-				add: (SpScrollableLayout with: #diagram); "Might work in the future"
-				add:
-					(SpBoxLayout newHorizontal
-						add: #resizeCheckBox;
-						add: #preferenceButton;
-						add: #copySourceButton)
-					withConstraints: [ :constraints | constraints height: self toolbarHeight ]);
-		yourself
+		  positionOfSlider: 60 percent;
+		  add: (SpPanedLayout newHorizontal
+				   positionOfSlider: 70 percent;
+				   add: (SpBoxLayout newVertical
+						    add: (SpPanedLayout newHorizontal
+								     positionOfSlider: 30 percent;
+								     add: #modelList;
+								     add: #classTable);
+						    add: ''
+						    withConstraints: [ :constraints | constraints height: 0 ];
+						    add: (SpBoxLayout newHorizontal
+								     add: 'Filter: [ :each | '
+								     withConstraints: [ :constraints | constraints width: 80 ];
+								     add: #filter;
+								     add: ' ]'
+								     withConstraints: [ :constraints | constraints width: 15 ])
+						    withConstraints: [ :constraints | 
+						    constraints height: self toolbarHeight ]);
+				   add: (SpBoxLayout newVertical
+						    add: #selectionTable;
+						    add: ''
+						    withConstraints: [ :constraints | constraints height: 0 ];
+						    add: #getTheDiagramButton
+						    withConstraints: [ :constraints | 
+							    constraints height: self toolbarHeight ]));
+		  add: (SpBoxLayout newVertical
+				   add: (SpBoxLayout newHorizontal
+						    add: #attributeCheckBox;
+						    add: #methodCheckBox;
+						    add: #inheritanceCheckBox;
+						    add: #aggregationCheckBox;
+						    add: #createCheckBox)
+				   withConstraints: [ :constraints | 
+				   constraints height: self toolbarHeight ];
+				   add: #diagram;
+				   "Might work in the future"add: (SpBoxLayout newHorizontal
+						    add: #resizeCheckBox;
+						    add: #preferenceButton;
+						    add: #copySourceButton)
+				   withConstraints: [ :constraints | 
+				   constraints height: self toolbarHeight ]);
+		  yourself
 ]
 
 { #category : #examples }
@@ -144,7 +141,7 @@ PUGizmoForMoose >> initialize [
 { #category : #initialization }
 PUGizmoForMoose >> initializePresenter [
 	modelList whenSelectionChangedDo: [ 	selectedClasses removeAll.self updateClasses ].
-	filter whenTextIsAcceptedDo: [ self updateClasses ].
+	filter whenSubmitDo: [ self updateClasses ].
 	getTheDiagramButton action: [ self setDiagram ].
 	preferenceButton action: [ self managePreferenceDialog ].
 	copySourceButton action: [ self copyUMLCode ].
@@ -170,7 +167,7 @@ PUGizmoForMoose >> initializeTables [
 				onActivation: [ :class | 
 					selectedClasses add: class.
 					self updateSelections ];
-				onDesactivation: [ :class | 
+				onDeactivation: [ :class | 
 					selectedClasses remove: class.
 					self updateSelections ];
 				width: 20;
@@ -187,7 +184,7 @@ PUGizmoForMoose >> initializeTables [
 		addColumn:
 			((SpCheckBoxTableColumn
 				evaluated: [ :class | selectedClasses includes: class ])
-				onDesactivation: [ :class | 
+				onDeactivation: [ :class | 
 					selectedClasses remove: class.
 					self updateSelections ];
 				width: 20;
@@ -201,24 +198,25 @@ PUGizmoForMoose >> initializeTables [
 
 { #category : #initialization }
 PUGizmoForMoose >> initializeWidgets [
+
 	self initializeTables.
 	modelList := self newList.
 	modelList
 		items: MooseModel root allModels;
 		display: [ :item | item name ];
-		icons: [ :item | item mooseIcon ];
+		displayIcon: [ :item | item mooseIcon ];
 		sortingBlock: [ :a :b | a name < b name ].
 	filter := self newTextInput placeholder: 'each isStub'.
 	getTheDiagramButton := self newButton disable
-		label: 'Get the diagram';
-		icon: (self iconNamed: #glamorousGo).
+		                       label: 'Get the diagram';
+		                       icon: (self iconNamed: #glamorousGo).
 	preferenceButton := self newButton disable label: 'Preference'.
-	copySourceButton := self newButton disable
-		label: 'Copy current UML code'.
+	copySourceButton := self newButton disable label:
+		                    'Copy current UML code'.
 	diagram := self newImage.
 	resizeCheckBox := self newCheckBox disable
-		label: 'Original size';
-		state: true.
+		                  label: 'Original size';
+		                  state: true.
 	attributeCheckBox := self newCheckBox disable label: 'Attributes'.
 	methodCheckBox := self newCheckBox disable label: 'Methods'.
 	inheritanceCheckBox := self newCheckBox disable label: 'Inheritance'.
