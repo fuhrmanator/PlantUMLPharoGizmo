@@ -3880,15 +3880,15 @@ PUGizmoForMooseTest >> simpleModel [
 
 { #category : #tests }
 PUGizmoForMooseTest >> testFilterClasses [
-	| items |
-	items := presenter classTable items
-		select: [ :each | each name beginsWith: 'P' ].
-	presenter filter
-		text: 'each name beginsWith:''P''';
-		accept.
+
+	| items filterText |
+	filterText := 'each name beginsWith:''P'''.
+	items := presenter classTable items select: [ :each | 
+		         each name beginsWith: 'P' ].
+	presenter filter text: filterText.
 	self assert: presenter classTable items size equals: items size.
-	presenter classTable items
-		do: [ :each | self assert: (each name beginsWith: 'P') ]
+	presenter classTable items do: [ :each | 
+		self assert: (each name beginsWith: 'P') ]
 ]
 
 { #category : #tests }

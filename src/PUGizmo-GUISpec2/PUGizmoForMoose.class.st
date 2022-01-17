@@ -140,13 +140,16 @@ PUGizmoForMoose >> initialize [
 
 { #category : #initialization }
 PUGizmoForMoose >> initializePresenter [
-	modelList whenSelectionChangedDo: [ 	selectedClasses removeAll.self updateClasses ].
-	filter whenSubmitDo: [ self updateClasses ].
+
+	modelList whenSelectionChangedDo: [ 
+		selectedClasses removeAll.
+		self updateClasses ].
+	filter whenTextChangedDo: [ self updateClasses ].
 	getTheDiagramButton action: [ self setDiagram ].
 	preferenceButton action: [ self managePreferenceDialog ].
 	copySourceButton action: [ self copyUMLCode ].
-	resizeCheckBox
-		whenChangedDo: [ :state | diagram autoScale: state not ].
+	resizeCheckBox whenChangedDo: [ :state | 
+		diagram autoScale: state not ].
 	attributeCheckBox whenChangedDo: [ self updateDiagram ].
 	methodCheckBox whenChangedDo: [ self updateDiagram ].
 	inheritanceCheckBox whenChangedDo: [ self updateDiagram ].
@@ -305,18 +308,32 @@ PUGizmoForMoose >> unselectClasses [
 
 { #category : #action }
 PUGizmoForMoose >> updateClasses [
-	| filterText filterBlock filteredItem |
+
+	| filterText filterBlock filteredItems normalColor redBg greenBg |
+	normalColor := Smalltalk ui theme backgroundColor.
+	redBg := normalColor mixed: 0.8 with: Color red.
+	greenBg := normalColor mixed: 0.8 with: Color green.
+
 	filterText := filter text.
 	filterText
-		ifEmpty: [ filteredItem := modelList selection selectedItem allClasses ]
-		ifNotEmpty: [ filterBlock := self buildBlockFrom: filterText.
-			[ filteredItem := modelList selection selectedItem allClasses
-				select: filterBlock ]
+		ifEmpty: [
+			filter adapter widget color: normalColor.
+			modelList selection selectedItem
+				ifNil: [ filteredItems := {  } ]
+				ifNotNil: [ 
+				filteredItems := modelList selection selectedItem allClasses ] ]
+		ifNotEmpty: [ 
+			filterBlock := self buildBlockFrom: filterText.
+			[ 
+			filteredItems := modelList selection selectedItem allClasses 
+				                 select: filterBlock.
+			filter adapter widget color: greenBg ]
 				on: Error
-				do: [
-					filteredItem := {} ] ].
-	classTable items: filteredItem.
-	filteredItem
+				do: [ 
+					filteredItems := modelList selection selectedItem allClasses.
+					filter adapter widget color: redBg ] ].
+	classTable items: filteredItems.
+	filteredItems
 		ifEmpty: [ getTheDiagramButton disable ]
 		ifNotEmpty: [ getTheDiagramButton enable ].
 	self updateSelections
