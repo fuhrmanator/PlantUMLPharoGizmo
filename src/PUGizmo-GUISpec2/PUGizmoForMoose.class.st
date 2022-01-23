@@ -317,7 +317,7 @@ PUGizmoForMoose >> updateClasses [
 	filterText := filter text.
 	filterText
 		ifEmpty: [
-			filter adapter widget color: normalColor.
+			filter adapter ifNotNil: [ adapter widget color: normalColor ].
 			modelList selection selectedItem
 				ifNil: [ filteredItems := {  } ]
 				ifNotNil: [ 
@@ -327,11 +327,11 @@ PUGizmoForMoose >> updateClasses [
 			[ 
 			filteredItems := modelList selection selectedItem allClasses 
 				                 select: filterBlock.
-			filter adapter widget color: greenBg ]
+			filter adapter ifNotNil: [ filter adapter widget color: greenBg ] ]
 				on: Error
 				do: [ 
 					filteredItems := modelList selection selectedItem allClasses.
-					filter adapter widget color: redBg ] ].
+					filter adapter ifNotNil: [filter adapter widget color: redBg] ] ].
 	classTable items: filteredItems.
 	filteredItems
 		ifEmpty: [ getTheDiagramButton disable ]
